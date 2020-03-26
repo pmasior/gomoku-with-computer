@@ -12,6 +12,7 @@ from constants import *
 class Gomoku:
     def __init__(self):
         pygame.init()
+        pygame.mixer.quit()  # avoid error when pygame CPU usage is 100%
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
