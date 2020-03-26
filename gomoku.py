@@ -38,7 +38,7 @@ class Gomoku:
                     self.running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 (x, y) = pygame.mouse.get_pos()
-                self.player1.move(x, y)
+                self.player1.check_move(x, y)
 
     def update(self):
         self.all_sprites.update()

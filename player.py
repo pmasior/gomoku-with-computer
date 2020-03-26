@@ -15,19 +15,16 @@ class Player():
     def update(self):
         pass
 
-    def move(self, mouse_x, mouse_y):
-        x, y = self.check_move(mouse_x, mouse_y)
-        if (x != None and y != None):
-            # print(x, y)
-            self.create_stone(x, y)
-
     def check_move(self, mouse_x, mouse_y):
         """ Sprawdza czy kliknięto w miejsce, gdzie można ustawić kamień """
         for x in range(GRID_BEGIN, GRID_END, GRID_TILESIZE):
             for y in range(GRID_BEGIN, GRID_END, GRID_TILESIZE):
                 if math.hypot(mouse_x - x, mouse_y - y) < STONE_RADIUS:
-                    return (x, y)
-        return (None, None)
+                    self.move(x, y)
+
+    def move(self, x, y):
+        """ Wykonuje funkcje, gdy ruch jest możliwy """
+        self.create_stone(x, y)
 
     def create_stone(self, x, y):
         # pygame.draw.circle(self.game.screen, self.color, (x, y), STONE_RADIUS)
