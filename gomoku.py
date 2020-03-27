@@ -6,6 +6,8 @@ import random
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # ukrycie powitania pygame
 import pygame
+
+from tie import *
 from player import *
 from constants import *
 
@@ -16,10 +18,10 @@ class Gomoku():
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
-        self.all_sprites = pygame.sprite.Group()
-        self.draw_background()
-        self.draw_grid()
-        self.tie = Tie(self)
+        self.winner = None
+        self.player1_wins = 0
+        self.player2_wins = 0
+        self.show_welcome_screen()
         self.run()
 
     def run(self):
@@ -38,88 +40,64 @@ class Gomoku():
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
             if event.type == pygame.MOUSEBUTTONUP:
-                self.events_after_mousebuttonup()
+                self.new_game()
 
     def update(self):
-        self.all_sprites.update()
-
-    def events_after_mousebuttonup(self):
-        (mouse_x, mouse_y) = pygame.mouse.get_pos()
-        self.tie.choose_player_for_move(mouse_x, mouse_y)
-        self.tie.print_board()
-        if self.tie.check_winner():
-            self.show_gameover_screen()
-
-    def show_gameover_screen(self):
         pass
 
     def draw(self):
         pygame.display.flip()
-        self.all_sprites.draw(self.screen)
+
+    def new_game(self):
+        self.tie = Tie(self.screen, self.clock)
+        self.save_last_game_status()
+
+    def save_last_game_status(self):
+        self.winner = self.tie.winner
+        if self.winner == 1:
+            self.player1_wins += 1
+            self.show_gameover_screen()
+        elif self.winner == 2:
+            self.player2_wins += 1
+            self.show_gameover_screen()
+        else:
+            self.show_break_in_game_screen()
+
+    def show_welcome_screen(self):
+        rules = "The winner is first player whose form unbroken line"
+        rules2 = "of five stones horizontally, vertically or diagonally"
+        action = "Click anywhere to start"
+        self.draw_screen(action, rules, rules2)
+
+    def show_gameover_screen(self):
+        rules = "Won player " + str(self.winner)
+        rules2 = "Player1    " + str(self.player1_wins)\
+                 + " : " + str(self.player2_wins) + "    Player 2"
+        action = "Click anywhere to restart"
+        self.draw_screen(action, rules, rules2)
+
+    def show_break_in_game_screen(self):
+        rules = "You are still playing"
+        action = "Click anywhere to back to the game or close window"
+        self.draw_screen(action, rules)
+
+    def draw_screen(self, action, rules, rules2 = None):
+        self.draw_background()
+        self.draw_text(self.screen, 100, 100, "Gomoku", 84, WHITE, FONT_ICEBERG)
+        self.draw_text(self.screen, 100, 250, rules, 28, WHITE, FONT_ICEBERG)
+        self.draw_text(self.screen, 100, 300, rules2, 28, WHITE, FONT_ICEBERG)
+        self.draw_text(self.screen, 100, 650, action, 28, WHITE, FONT_ICEBERG)
 
     def draw_background(self):
-        self.screen.fill(SAND)
+        self.screen.fill(BLACK)
 
-    def draw_grid(self):
-        """ Rysuje pionowe i poziome linie """
-        for c in range(GRID_BEGIN, GRID_END, GRID_TILESIZE):
-            pygame.draw.line(self.screen, DARK_GRAY, (c, GRID_BEGIN), (c, GRID_END), 2)
-            pygame.draw.line(self.screen, DARK_GRAY, (GRID_BEGIN, c), (GRID_END, c), 2)
-
-
-class Tie():
-    def __init__(self, game):
-        self.game = game
-        self.next_player = 1
-        self.board = [[None for n in range(16)] for m in range(16)]
-        self.create_players()
-
-    def choose_player_for_move(self, mouse_x, mouse_y):
-        if self.next_player == 1:
-            if self.player1.check_move(mouse_x, mouse_y):
-                self.next_player = 2
-        elif self.next_player == 2:
-            if self.player2.check_move(mouse_x, mouse_y):
-                self.next_player = 1
-
-    def print_board(self):
-        for m in range(0, FIELDS):
-            for n in range(0, FIELDS):
-                if self.board[n][m] != None:
-                    print(self.board[n][m], end=' ')
-                else:
-                    print(" ", end=' ')
-            print()
-
-    def check_winner(self):
-        for m in range(0, FIELDS - 4):
-            for n in range(0, FIELDS - 4):
-                if self.check_winner_horizontally(n, m) or \
-                   self.check_winner_vertically(n, m) or \
-                   self.check_winner_diagonally(n, m):
-                    self.game.running = False
-
-    def check_winner_horizontally(self, n, m):
-        if self.board[n][m] == self.board[n+1][m] == self.board[n+2][m] == \
-           self.board[n+3][m] == self.board[n+4][m] != None:
-            return self.board[n][m]
-        return False
-
-    def check_winner_vertically(self, n, m):
-        if self.board[n][m] == self.board[n][m+1] == self.board[n][m+2] == \
-           self.board[n][m+3] == self.board[n][m+4] != None:
-            return self.board[n][m]
-        return False
-
-    def check_winner_diagonally(self, n, m):
-        if self.board[n][m] == self.board[n+1][m+1] == self.board[n+2][m+2] == \
-           self.board[n+3][m+3] == self.board[n+4][m+4] != None:
-            return self.board[n][m]
-        return False
-
-    def create_players(self):
-        self.player1 = Player(self.game, self, 1, BLACK)
-        self.player2 = Player(self.game, self, 2, WHITE)
+    def draw_text(self, surface, x, y, text, size, color, font_family):
+        # font_family = pygame.font.match_font(font_name)
+        font = pygame.font.Font(font_family, size)
+        rendered_text = font.render(text, True, color)
+        rect = rendered_text.get_rect()
+        rect.topleft = (x, y)
+        surface.blit(rendered_text, rect)
 
 
 if __name__ == "__main__":

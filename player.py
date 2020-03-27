@@ -3,12 +3,12 @@
 
 import pygame
 import math
+
 from constants import *
 
 class Player():
-    def __init__(self, game, tie, number, color):
-        # pygame.sprite.Sprite.__init__(self)
-        self.game = game
+    def __init__(self, screen, tie, number, color):
+        self.screen = screen
         self.tie = tie
         self.color = color
         self.number = number
@@ -44,9 +44,8 @@ class Player():
         self.tie.board[n][m] = self.number
 
     def draw_move(self, x, y):
-        # pygame.draw.circle(self.game.screen, self.color, (x, y), STONE_RADIUS)
         stone = Stone(self.color, x, y)
-        self.game.all_sprites.add(stone)
+        self.tie.all_sprites.add(stone)
         self.stone_sprites.add(stone)
 
 
@@ -65,3 +64,7 @@ class Stone(pygame.sprite.Sprite):
             self.image = pygame.image.load(IMG_BLACK_STONE)
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
+
+
+if __name__ == "__main__":
+    print("You should run gomoku.py file")

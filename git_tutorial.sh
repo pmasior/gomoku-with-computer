@@ -1,3 +1,8 @@
+#!/bin/bash
+echo "You should run gomoku.py file"
+exit 1
+echo "This file is executing"
+
 git init  # inicjowanie nowego repozytorium
 
 git status  # status plików (zmodyfikowane, śledzone, zatwierdzone)
