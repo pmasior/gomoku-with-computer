@@ -1,0 +1,10 @@
+Apliacja korzysta z obrazów pochodzących z projektu Boardgame
+pack v2 by Kenney Vleugels, które zostały udostępnione na licencji
+Creative Commons 0.
+Link: www.kenney.nl
+Link do licencji: https://creativecommons.org/publicdomain/zero/1.0/
+
+W aplikacji została użyta czcionka Iceberg, która udostępniona jest
+na licencji SIL Open Font License 1.1.
+Link: https://fonts.google.com/specimen/Iceberg?category=Display
+Link do licencji: https://scripts.sil.org/OFL
