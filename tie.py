@@ -45,11 +45,12 @@ class Tie():
     def events_after_mousebuttonup(self):
         (mouse_x, mouse_y) = pygame.mouse.get_pos()
         n, m = self.choose_player_and_move(mouse_x, mouse_y)
-        print_board(self.board)
-        if self.check_winner(n ,m):
-            self.playing = False
-            print("END")
-        self.change_player()
+        if n != None and m != None:
+            print_board(self.board)
+            if self.check_winner(n ,m):
+                self.playing = False
+                print("END")
+            self.change_player()
 
     def choose_player_and_move(self, mouse_x, mouse_y):
         if self.next_player == 1:
@@ -64,7 +65,7 @@ class Tie():
         """ Sprawdza czy wygrana
 
         Przyjmuje jako argument współrzędne ostatniego ruchu ostatniego gracza,
-        następnie dla r równych -4, -3, -2, -1, 0 sprawdza czy wygrana wystąpiła
+        następnie dla r równych -2, -1, 0, 1, 2 sprawdza czy wygrana wystąpiła
         w poziomie, pionie lub po któreś z przekątnych
 
         r pozwala pokryć wszystkie możliwości skrajne i pośrednie przy
@@ -74,7 +75,7 @@ class Tie():
         a _ puste miejsce lub kamień drugiego gracza
         """
         if n != None and m != None:
-            for r in range(-4, 1):
+            for r in range(-2, 3):
                 if self.check_winner_horizontally(n, m, r) or \
                    self.check_winner_vertically(n, m, r) or \
                    self.check_winner_diagonally1(n, m, r) or \
@@ -86,56 +87,124 @@ class Tie():
         """ Sprawdza czy wygrana w poziomie
 
         Przyjmuje jako argument współrzędne ostatniego ruchu ostatniego gracza.
-        Pomija sprawdzanie pól, które są poza planszą (_ < 0 lub _ > FIELDS),
-        potem sprawdza czy w poziomie jest po kolei 5 takich samych kamieni, a
-        # jeśli jest więcej niż 5 takich samych kamieni pod rząd to zwraca Fałsz.
+        Pomija sprawdzanie pól, które są poza planszą (_ < 0 lub _ > FIELDS).
+        Potem sprawdza czy w poziomie jest dokładnie 5 takich samych kamieni,
+        czyli sprawdza również czy poprzedni kamień i następny kamień nie są
+        tego samego gracza.
         """
-        # TODO Zmienić, bo działa dla więcej niż 5 kamieni
-        if (n+r) >= 0 and (n+r+4) < FIELDS:
-            if self.board[n+r][m] == self.board[n+r+1][m] == \
-               self.board[n+r+2][m] == self.board[n+r+3][m] == \
-               self.board[n+r+4][m] != None:
-                # if (n+r+5) < FIELDS:
-                #     if self.board[n+r+5][m] == self.board[n+r][m]:
-                #         return False
-                return True
-        return False
+        left = n - 2 + r
+        right = n + 2 + r
+        more_left = left - 1
+        more_right = right + 1
+        if left >= 0 and right < FIELDS:
+            s1 = self.board[left][m]
+            s2 = self.board[left+1][m]
+            s3 = self.board[left+2][m]
+            s4 = self.board[left+3][m]
+            s5 = self.board[right][m]
+            print("h ", s1, s2, s3, s4, s5)
+        else:
+            return False
+        if more_left >= 0:
+            s0 = self.board[more_left][m]
+        else:
+            s0 = None
+        if more_right < FIELDS:
+            s6 = self.board[more_right][m]
+        else:
+            s6 = None
+
+        if s1 == s2 == s3 == s4 == s5 == self.next_player and s0 != s1 and s5 != s6:
+            return True
 
     def check_winner_vertically(self, n, m, r):
         """ Sprawdza czy wygrana w pionie """
-        if (m+r) >= 0 and (m+r+4) < FIELDS:
-            if self.board[n][m+r] == self.board[n][m+r+1] == \
-               self.board[n][m+r+2] == self.board[n][m+r+3] == \
-               self.board[n][m+r+4] != None:
-                # if (m+r+5) < FIELDS:
-                #     if self.board[n][m+r+5] == self.board[n][m+r]:
-                #         return False
-                return True
-        return False
+        top = m - 2 + r
+        down = m + 2 + r
+        more_top = top - 1
+        more_down = down + 1
+        if top >= 0 and down < FIELDS:
+            s1 = self.board[n][top]
+            s2 = self.board[n][top + 1]
+            s3 = self.board[n][top + 2]
+            s4 = self.board[n][top + 3]
+            s5 = self.board[n][down]
+            print("v ", s1, s2, s3, s4, s5)
+        else:
+            return False
+        if more_top >= 0:
+            s0 = self.board[n][more_top]
+        else:
+            s0 = None
+        if more_down < FIELDS:
+            s6 = self.board[n][more_down]
+        else:
+            s6 = None
+
+        if s1 == s2 == s3 == s4 == s5 == self.next_player and s0 != s1 and s5 != s6:
+            return True
 
     def check_winner_diagonally1(self, n, m, r):
-        """ Sprawdza czy wygrana po przekątnej \ """
-        if (n+r) >= 0 and (m+r) >= 0 and (n+r+4) < FIELDS and (m+r+4) < FIELDS:
-            if self.board[n+r][m+r] == self.board[n+r+1][m+r+1] == \
-               self.board[n+r+2][m+r+2] == self.board[n+r+3][m+r+3] == \
-               self.board[n+r+4][m+r+4] != None:
-                # if (n+r+5) < FIELDS and (m+r+5) < FIELDS:
-                #     if self.board[n+r+5][m+r+5] == self.board[n+r][m+r]:
-                #         return False
-                return True
-        return False
+        """ Sprawdza czy wygrana po przekątnej  """
+        left = n - 2 + r
+        right = n + 2 + r
+        more_left = left - 1
+        more_right = right + 1
+        top = m - 2 + r
+        down = m + 2 + r
+        more_top = top - 1
+        more_down = down + 1
+        if left >= 0 and right < FIELDS and top >= 0 and down < FIELDS:
+            s1 = self.board[left][top]
+            s2 = self.board[left + 1][top + 1]
+            s3 = self.board[left + 2][top + 2]
+            s4 = self.board[left + 3][top + 3]
+            s5 = self.board[right][down]
+        else:
+            return False
+        if more_left >= 0 and more_top >= 0:
+            s0 = self.board[more_left][more_top]
+        else:
+            s0 = None
+        if more_right < FIELDS and more_down < FIELDS:
+            s6 = self.board[more_right][more_down]
+        else:
+            s6 = None
+
+        if s1 == s2 == s3 == s4 == s5 == self.next_player and s0 != s1 and s5 != s6:
+            return True
 
     def check_winner_diagonally2(self, n, m, r):
         """ Sprawdza czy wygrana po przekątnej / """
-        if (n-r) < FIELDS and (m+r) >= 0 and (n-(r+4)) >= 0 and (m+r+4) < FIELDS:
-            if self.board[n-r][m+r] == self.board[n-(r+1)][m+r+1] == \
-               self.board[n-(r+2)][m+r+2] == self.board[n-(r+3)][m+r+3] == \
-               self.board[n-(r+4)][m+r+4] != None:
-                # if (n-(r+5)) >= 0 and (m+r+5) < FIELDS:
-                #     if self.board[n-(r+5)][m+r+5] == self.board[n-r][m+r]:
-                #         return False
-                return True
-        return False
+        s = -r
+        left = n - 2 + s
+        right = n + 2 + s
+        more_left = left - 1
+        more_right = right + 1
+        top = m - 2 + r
+        down = m + 2 + r
+        more_top = top - 1
+        more_down = down + 1
+        # print("d2 n =", n, "m =", m, "n €", left, right, "m €", top, down)
+        if left >= 0 and right < FIELDS and top >= 0 and down < FIELDS:
+            s1 = self.board[right][top]
+            s2 = self.board[left + 3][top + 1]
+            s3 = self.board[left + 2][top + 2]
+            s4 = self.board[left + 1][top + 3]
+            s5 = self.board[left][down]
+        else:
+            return False
+        if more_right < FIELDS and more_top >= 0:
+            s0 = self.board[more_right][more_top]
+        else:
+            s0 = None
+        if more_left >= 0 and more_down < FIELDS:
+            s6 = self.board[more_left][more_down]
+        else:
+            s6 = None
+
+        if s1 == s2 == s3 == s4 == s5 == self.next_player and s0 != s1 and s5 != s6:
+            return True
 
     def change_player(self):
         if self.next_player == 1:
