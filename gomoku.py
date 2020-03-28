@@ -20,6 +20,7 @@ class Gomoku():
         self.clock = pygame.time.Clock()
         self.player1_wins = 0
         self.player2_wins = 0
+        self.player_tie = 0
         self.show_welcome_screen()
         self.run()
 
@@ -56,12 +57,13 @@ class Gomoku():
         self.winner = self.tie.winner
         if self.winner == 1:
             self.player1_wins += 1
-            self.show_gameover_screen()
         elif self.winner == 2:
             self.player2_wins += 1
-            self.show_gameover_screen()
+        elif self.winner == TIE_STATUS:
+            self.player_tie += 1
         else:
-            self.show_break_in_game_screen()
+            self.running = False
+        self.show_gameover_screen()
 
     def show_welcome_screen(self):
         rules = "The winner is first player whose form unbroken line"
@@ -70,16 +72,20 @@ class Gomoku():
         self.draw_screen(action, rules, rules2)
 
     def show_gameover_screen(self):
-        rules = "Won player " + str(self.winner)
+        rules = None
+        if self.winner == 1 or self.winner == 2:
+            rules = "Won player " + str(self.winner)
+        if self.winner == TIE_STATUS:
+            rules = "Tie. There is no winner"
         rules2 = "Player1    " + str(self.player1_wins)\
-                 + " : " + str(self.player2_wins) + "    Player 2"
+        + " : " + str(self.player2_wins) + "    Player 2"
         action = "Click anywhere to restart"
         self.draw_screen(action, rules, rules2)
 
-    def show_break_in_game_screen(self):
-        rules = "You are still playing"
-        action = "Click anywhere to back to the game or close window"
-        self.draw_screen(action, rules)
+    # def show_break_in_game_screen(self):
+    #     rules = "You are still playing"
+    #     action = "Click anywhere to back to the game or close window"
+    #     self.draw_screen(action, rules)
 
     def draw_screen(self, action, rules, rules2 = None):
         self.draw_background()

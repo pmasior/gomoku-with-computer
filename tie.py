@@ -12,7 +12,7 @@ class Tie():
         self.screen = screen
         self.clock = clock
         self.next_player = 1
-        self.board = [[None for n in range(16)] for m in range(16)]
+        self.board = [[None for n in range(FIELDS)] for m in range(FIELDS)]
         self.all_sprites = pygame.sprite.Group()
         self.winner = None
         self.create_players()
@@ -47,9 +47,8 @@ class Tie():
         n, m = self.choose_player_and_move(mouse_x, mouse_y)
         if n != None and m != None:
             print_board(self.board)
-            if self.check_winner(n ,m):
+            if self.check_gameover(n ,m):
                 self.playing = False
-                print("END")
             self.change_player()
 
     def choose_player_and_move(self, mouse_x, mouse_y):
@@ -61,8 +60,8 @@ class Tie():
             return n, m
         return None, None
 
-    def check_winner(self, n, m):
-        """ Sprawdza czy wygrana
+    def check_gameover(self, n, m):
+        """ Sprawdza czy koniec gry (wygrana lub remis)
 
         Przyjmuje jako argument współrzędne ostatniego ruchu ostatniego gracza,
         następnie dla r równych -2, -1, 0, 1, 2 sprawdza czy wygrana wystąpiła
@@ -82,6 +81,9 @@ class Tie():
                    self.check_winner_diagonally2(n, m, r):
                     self.winner = self.board[n][m]
                     return self.board[n][m]
+                elif self.check_tie():
+                    self.winner = TIE_STATUS
+                    return TIE_STATUS
 
     def check_winner_horizontally(self, n, m, r):
         """ Sprawdza czy wygrana w poziomie
@@ -102,7 +104,6 @@ class Tie():
             s3 = self.board[left+2][m]
             s4 = self.board[left+3][m]
             s5 = self.board[right][m]
-            print("h ", s1, s2, s3, s4, s5)
         else:
             return False
         if more_left >= 0:
@@ -129,7 +130,6 @@ class Tie():
             s3 = self.board[n][top + 2]
             s4 = self.board[n][top + 3]
             s5 = self.board[n][down]
-            print("v ", s1, s2, s3, s4, s5)
         else:
             return False
         if more_top >= 0:
@@ -145,7 +145,7 @@ class Tie():
             return True
 
     def check_winner_diagonally1(self, n, m, r):
-        """ Sprawdza czy wygrana po przekątnej  """
+        """ Sprawdza czy wygrana po przekątnej \ """
         left = n - 2 + r
         right = n + 2 + r
         more_left = left - 1
@@ -185,7 +185,6 @@ class Tie():
         down = m + 2 + r
         more_top = top - 1
         more_down = down + 1
-        # print("d2 n =", n, "m =", m, "n €", left, right, "m €", top, down)
         if left >= 0 and right < FIELDS and top >= 0 and down < FIELDS:
             s1 = self.board[right][top]
             s2 = self.board[left + 3][top + 1]
@@ -206,6 +205,9 @@ class Tie():
         if s1 == s2 == s3 == s4 == s5 == self.next_player and s0 != s1 and s5 != s6:
             return True
 
+    def check_tie(self):
+        return sum([j.count(1) + j.count(2) for j in self.board]) > (FIELDS-1)**2
+
     def change_player(self):
         if self.next_player == 1:
             self.next_player = 2
@@ -219,9 +221,7 @@ class Tie():
         """ Rysuje pionowe i poziome linie """
         for c in range(GRID_BEGIN, GRID_END, GRID_TILESIZE):
             pygame.draw.line(self.screen, DARK_GRAY, (c, GRID_BEGIN), (c, GRID_END), 2)
-            # pygame.gfxdraw.line(self.screen, c, GRID_BEGIN, c, GRID_END, DARK_GRAY)
             pygame.draw.line(self.screen, DARK_GRAY, (GRID_BEGIN, c), (GRID_END, c), 2)
-            # pygame.gfxdraw.line(self.screen, GRID_BEGIN, c, GRID_END, c, DARK_GRAY)
 
     def create_players(self):
         self.player1 = Player(self.screen, self, 1, BLACK)
