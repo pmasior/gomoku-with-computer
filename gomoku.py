@@ -18,7 +18,6 @@ class Gomoku():
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
-        self.winner = None
         self.player1_wins = 0
         self.player2_wins = 0
         self.show_welcome_screen()
@@ -49,6 +48,7 @@ class Gomoku():
         pygame.display.flip()
 
     def new_game(self):
+        self.winner = None
         self.tie = Tie(self.screen, self.clock)
         self.save_last_game_status()
 

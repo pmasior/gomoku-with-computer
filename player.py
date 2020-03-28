@@ -27,8 +27,8 @@ class Player():
                    self.check_if_field_is_empty(n, m):
                     self.write_move(n, m)
                     self.draw_move(x, y)
-                    return True
-        return False
+                    return n, m
+        return None, None
 
     def check_if_clicked_in_field(self, x, y, mouse_x, mouse_y):
         if math.hypot(mouse_x - x, mouse_y - y) < STONE_RADIUS:
