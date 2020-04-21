@@ -88,13 +88,13 @@ class Gomoku():
 
     def draw_screen(self, action, rules, rules2 = None):
         self.draw_background()
-        self.draw_text(self.screen, 100, 100, "Gomoku", 84, WHITE, FONT_ICEBERG)
-        self.draw_text(self.screen, 100, 250, rules, 28, WHITE, FONT_ICEBERG)
-        self.draw_text(self.screen, 100, 300, rules2, 28, WHITE, FONT_ICEBERG)
-        self.draw_text(self.screen, 100, 650, action, 28, WHITE, FONT_ICEBERG)
+        self.draw_text(self.screen, 100, 100, "Gomoku", 84, LIGHT_SAND, FONT_ICEBERG)
+        self.draw_text(self.screen, 100, 250, rules, 28, LIGHT_SAND, FONT_ICEBERG)
+        self.draw_text(self.screen, 100, 300, rules2, 28, LIGHT_SAND, FONT_ICEBERG)
+        self.draw_text(self.screen, 100, 650, action, 28, LIGHT_SAND, FONT_ICEBERG)
 
     def draw_background(self):
-        self.screen.fill(BLACK)
+        self.screen.fill(DARK_GRAY)
 
     def draw_text(self, surface, x, y, text, size, color, font_family):
         font = pygame.font.Font(font_family, size)
