@@ -109,24 +109,6 @@ class Tie():
                 return True
         return False
 
-        # TODO delete in next commit
-        # left = n - 2 + out_extent
-        # right = n + 2 + out_extent
-        # if left >= 0 and right < FIELDS:
-        #     for in_extent in range (-1, 3):
-        #         x = n + in_extent + out_extent
-        #         if self.board[x][m] != self.next_player:
-        #             return False
-        # else:
-        #     return False
-        # if left - 1 >= 0:
-        #     if self.board[left - 1][m] == self.next_player:
-        #         return False
-        # if right + 1 < FIELDS:
-        #     if self.board[right + 1][m] == self.next_player:
-        #         return False
-        # return True
-
     def check_winner_vertically(self, n, m, out_extent):
         """ Sprawdza czy wygrana w pionie """
         top = m - 2 + out_extent
