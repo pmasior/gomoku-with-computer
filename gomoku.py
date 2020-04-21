@@ -20,7 +20,8 @@ class Gomoku():
         self.clock = pygame.time.Clock()
         self.player1_wins = 0
         self.player2_wins = 0
-        self.player_tie = 0
+        self.player_draw = 0
+        self.last_winner = 0
         self.show_welcome_screen()
         self.run()
 
@@ -51,19 +52,20 @@ class Gomoku():
     def new_game(self):
         self.winner = None
         self.tie = Tie(self.screen, self.clock)
+        self.game_over()
+
+    def game_over(self):
         self.save_last_game_status()
+        self.show_gameover_screen()
 
     def save_last_game_status(self):
         self.winner = self.tie.winner
-        if self.winner == 1:
+        if self.winner == PLAYER_1:
             self.player1_wins += 1
-        elif self.winner == 2:
+        elif self.winner == PLAYER_2:
             self.player2_wins += 1
-        elif self.winner == TIE_STATUS:
-            self.player_tie += 1
-        else:
-            self.running = False
-        self.show_gameover_screen()
+        elif self.winner == PLAYER_DRAW:
+            self.player_draw += 1
 
     def show_welcome_screen(self):
         rules = "The winner is first player whose form unbroken line"
@@ -75,17 +77,14 @@ class Gomoku():
         rules = None
         if self.winner == 1 or self.winner == 2:
             rules = "Won player " + str(self.winner)
-        if self.winner == TIE_STATUS:
-            rules = "Tie. There is no winner"
+        elif self.winner == PLAYER_DRAW:
+            rules = "Draw. There is no winner"
+        else:
+            rules = "You are still playing"
         rules2 = "Player1    " + str(self.player1_wins)\
         + " : " + str(self.player2_wins) + "    Player 2"
-        action = "Click anywhere to restart"
+        action = "Click anywhere to start next game"
         self.draw_screen(action, rules, rules2)
-
-    # def show_break_in_game_screen(self):
-    #     rules = "You are still playing"
-    #     action = "Click anywhere to back to the game or close window"
-    #     self.draw_screen(action, rules)
 
     def draw_screen(self, action, rules, rules2 = None):
         self.draw_background()
@@ -98,7 +97,6 @@ class Gomoku():
         self.screen.fill(BLACK)
 
     def draw_text(self, surface, x, y, text, size, color, font_family):
-        # font_family = pygame.font.match_font(font_name)
         font = pygame.font.Font(font_family, size)
         rendered_text = font.render(text, True, color)
         rect = rendered_text.get_rect()

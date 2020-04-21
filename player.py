@@ -17,7 +17,7 @@ class Player():
     def update(self):
         pass
 
-    def check_move(self, mouse_x, mouse_y):
+    def move(self, mouse_x, mouse_y):
         """ Sprawdza czy ruch jest dozwolony, jeśli jest to go wykonuje """
         for m in range(0, FIELDS):
             y = GRID_BEGIN + m * GRID_TILESIZE
