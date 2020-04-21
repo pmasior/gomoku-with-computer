@@ -185,13 +185,13 @@ class Tie():
             self.next_player = 1
 
     def draw_background(self):
-        self.screen.fill(SAND)
+        self.screen.fill(DARK_SAND)
 
     def draw_grid(self):
         """ Rysuje pionowe i poziome linie """
         for c in range(GRID_BEGIN, GRID_END, GRID_TILESIZE):
-            pygame.draw.line(self.screen, DARK_GRAY, (c, GRID_BEGIN), (c, GRID_END), 2)
-            pygame.draw.line(self.screen, DARK_GRAY, (GRID_BEGIN, c), (GRID_END, c), 2)
+            pygame.draw.line(self.screen, SAND, (c, GRID_BEGIN), (c, GRID_END), 2)
+            pygame.draw.line(self.screen, SAND, (GRID_BEGIN, c), (GRID_END, c), 2)
 
     def create_players(self):
         self.player1 = Player(self.screen, self, 1, BLACK)
