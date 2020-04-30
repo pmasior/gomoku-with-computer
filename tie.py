@@ -7,6 +7,7 @@ from constants import *
 from player import *
 from develop import *
 
+
 class Tie():
     def __init__(self, screen, clock):
         self.screen = screen
@@ -19,6 +20,7 @@ class Tie():
         self.draw_background()
         self.draw_grid()
         self.run()
+        init_debug_file()
 
     def run(self):
         self.playing = True
@@ -33,35 +35,45 @@ class Tie():
             if event.type == pygame.QUIT:
                 self.playing = False
             if event.type == pygame.MOUSEBUTTONUP:
-                self.events_after_mousebuttonup()
+                if self.next_player == PLAYER_1:
+                    self.move_human()
 
     def update(self):
         self.all_sprites.update()
+        if self.next_player == PLAYER_2:
+            self.move_computer()
 
     def draw(self):
         pygame.display.flip()
         self.all_sprites.draw(self.screen)
 
-    def events_after_mousebuttonup(self):
+    def move_human(self):
         (mouse_x, mouse_y) = pygame.mouse.get_pos()
-        n, m = self.choose_player_and_move(mouse_x, mouse_y)
+        n, m = self.player1.move(mouse_x, mouse_y)
         if n != None and m != None:
-            # print_board(self.board)
-            self.end_if_gameover(n, m)
+            # if self.next_player == 1:  # DEBUG:
+            #     print("if 1")  # DEBUG:
+            self.draw()
+            if LOG_STATE_OF_BOARD > 0:
+                print_board(self.board, "Tie")
+            self.end_if_gameover(n, m, self.board)
             self.change_player()
 
-    def choose_player_and_move(self, mouse_x, mouse_y):
-        if self.next_player == 1:
-            n, m = self.player1.move(mouse_x, mouse_y)
-        elif self.next_player == 2:
-            n, m = self.player2.move(mouse_x, mouse_y)
-        return n, m
+    def move_computer(self):
+        n, m = self.player2.move()
+        if LOG_STATE_OF_BOARD > 0:
+            print_board(self.board, "Tie")
+        self.end_if_gameover(n, m, self.board)
+        self.change_player()
 
-    def end_if_gameover(self, n, m):
-        if self.check_winner(n ,m) or self.check_draw():
+    def end_if_gameover(self, n, m, board):
+        if self.check_winner(n, m, board, self.next_player):
+            self.winner = board[n][m]
+            self.playing = False
+        if self.check_draw(board):
             self.playing = False
 
-    def check_winner(self, n, m):
+    def check_winner(self, n, m, board, player):
         """ Sprawdza czy koniec gry (wygrana lub remis)
 
         Przyjmuje jako argument współrzędne ostatniego ruchu ostatniego gracza
@@ -74,15 +86,16 @@ class Tie():
         gdzie + oznacza kamień jednego gracza,
         a _ puste miejsce lub kamień drugiego gracza
         """
+        if n == None or m == None:
+            return False
         for out_extent in range(-2, 3):
-            if self.check_winner_horizontally(n, m, out_extent) or \
-               self.check_winner_vertically(n, m, out_extent) or \
-               self.check_winner_diagonally1(n, m, out_extent) or \
-               self.check_winner_diagonally2(n, m, out_extent):
-                self.winner = self.board[n][m]
+            if self.check_winner_horizontally(n, m, out_extent, board, player) or \
+               self.check_winner_vertically(n, m, out_extent, board, player) or \
+               self.check_winner_diagonally1(n, m, out_extent, board, player) or \
+               self.check_winner_diagonally2(n, m, out_extent, board, player):
                 return True
 
-    def check_winner_horizontally(self, n, m, out_extent):
+    def check_winner_horizontally(self, n, m, out_extent, board, player):
         """ Sprawdza czy wygrana w poziomie
 
         Przyjmuje jako argument współrzędne ostatniego ruchu ostatniego gracza.
@@ -94,95 +107,99 @@ class Tie():
         left = n - 2 + out_extent
         right = n + 2 + out_extent
         if left - 1 >= 0:
-            if self.board[left - 1][m] == self.next_player:
+            if board[left - 1][m] == player:
                 return False
         if right + 1 < FIELDS:
-            if self.board[right + 1][m] == self.next_player:
+            if board[right + 1][m] == player:
                 return False
         if left >= 0 and right < FIELDS:
-            if self.board[left][m] == \
-               self.board[left+1][m] == \
-               self.board[left+2][m] == \
-               self.board[left+3][m] == \
-               self.board[right][m] == \
-               self.next_player:
+            if board[left][m] == \
+               board[left+1][m] == \
+               board[left+2][m] == \
+               board[left+3][m] == \
+               board[right][m] == \
+               player:
                 return True
         return False
 
-    def check_winner_vertically(self, n, m, out_extent):
+    def check_winner_vertically(self, n, m, out_extent, board, player):
         """ Sprawdza czy wygrana w pionie """
         top = m - 2 + out_extent
         down = m + 2 + out_extent
         if top - 1 >= 0:
-            if self.board[n][top - 1] == self.next_player:
+            if board[n][top - 1] == player:
+                # print("f1")  # DEBUG:
                 return False
         if down + 1 < FIELDS:
-            if self.board[n][down + 1] == self.next_player:
+            if board[n][down + 1] == player:
+                # print("f2")  # DEBUG:
                 return False
         if top >= 0 and down < FIELDS:
-            if self.board[n][top] == \
-               self.board[n][top + 1] == \
-               self.board[n][top + 2] == \
-               self.board[n][top + 3] == \
-               self.board[n][down] == \
-               self.next_player:
+            if board[n][top] == \
+               board[n][top + 1] == \
+               board[n][top + 2] == \
+               board[n][top + 3] == \
+               board[n][down] == \
+               player:
+                # print("true")  # DEBUG:
                 return True
+        # print("f3")  # DEBUG:
         return False
 
-    def check_winner_diagonally1(self, n, m, out_extent):
+    def check_winner_diagonally1(self, n, m, out_extent, board, player):
         """ Sprawdza czy wygrana po przekątnej \ """
         left = n - 2 + out_extent
         right = n + 2 + out_extent
         top = m - 2 + out_extent
         down = m + 2 + out_extent
         if left - 1 >= 0 and top - 1 >= 0:
-            if self.board[left - 1][top - 1] == self.next_player:
+            if board[left - 1][top - 1] == player:
                 return False
         if right + 1 < FIELDS and down + 1 < FIELDS:
-            if self.board[right + 1][down + 1] == self.next_player:
+            if board[right + 1][down + 1] == player:
                 return False
         if left >= 0 and right < FIELDS and top >= 0 and down < FIELDS:
-            if self.board[left][top] == \
-               self.board[left + 1][top + 1] == \
-               self.board[left + 2][top + 2] == \
-               self.board[left + 3][top + 3] == \
-               self.board[right][down] == \
-               self.next_player:
+            if board[left][top] == \
+               board[left + 1][top + 1] == \
+               board[left + 2][top + 2] == \
+               board[left + 3][top + 3] == \
+               board[right][down] == \
+               player:
                 return True
         return False
 
-    def check_winner_diagonally2(self, n, m, out_extent):
+    def check_winner_diagonally2(self, n, m, out_extent, board, player):
         """ Sprawdza czy wygrana po przekątnej / """
         left = n - 2 + (-out_extent)
         right = n + 2 + (-out_extent)
         top = m - 2 + out_extent
         down = m + 2 + out_extent
         if right + 1 < FIELDS and top - 1 >= 0:
-            if self.board[right + 1][top - 1] == self.next_player:
+            if board[right + 1][top - 1] == player:
                 return False
         if left - 1 >= 0 and down + 1 < FIELDS:
-            if self.board[left - 1][down + 1] == self.next_player:
+            if board[left - 1][down + 1] == player:
                 return False
         if left >= 0 and right < FIELDS and top >= 0 and down < FIELDS:
-            if self.board[right][top] == \
-               self.board[left + 3][top + 1] == \
-               self.board[left + 2][top + 2] == \
-               self.board[left + 1][top + 3] == \
-               self.board[left][down] == \
-               self.next_player:
+            if board[right][top] == \
+               board[left + 3][top + 1] == \
+               board[left + 2][top + 2] == \
+               board[left + 1][top + 3] == \
+               board[left][down] == \
+               player:
                 return True
         return False
 
-    def check_draw(self):
-        if sum([j.count(PLAYER_1) + j.count(PLAYER_2) for j in self.board]) > (FIELDS-1)**2:
+    def check_draw(self, board):
+        if sum([j.count(PLAYER_1) + j.count(PLAYER_2) for j in board]) > (FIELDS-1)**2:
             self.winner = PLAYER_DRAW
             return True
 
     def change_player(self):
-        if self.next_player == 1:
-            self.next_player = 2
-        elif self.next_player == 2:
-            self.next_player = 1
+        if self.next_player == PLAYER_1:
+            self.next_player = PLAYER_2
+        elif self.next_player == PLAYER_2:
+            self.next_player = PLAYER_1
 
     def draw_background(self):
         self.screen.fill(DARK_SAND)
@@ -194,8 +211,9 @@ class Tie():
             pygame.draw.line(self.screen, SAND, (GRID_BEGIN, c), (GRID_END, c), 2)
 
     def create_players(self):
-        self.player1 = Player(self.screen, self, 1, BLACK)
-        self.player2 = Player(self.screen, self, 2, WHITE)
+        self.player1 = Human(self.screen, self, PLAYER_1, BLACK)
+        self.player2 = Computer(self.screen, self, PLAYER_2, WHITE)
+
 
 
 if __name__ == "__main__":

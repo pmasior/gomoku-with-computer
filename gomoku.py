@@ -5,11 +5,17 @@ import sys
 import random
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # ukrycie powitania pygame
-import pygame
+try:
+    import pygame
+except ModuleNotFoundError:
+    print("Module Pygame not found, so you should install it using command:")
+    print("python3 -m pip install pygame")
+    sys.exit()
 
 from tie import *
 from player import *
 from constants import *
+
 
 class Gomoku():
     def __init__(self):
@@ -37,9 +43,12 @@ class Gomoku():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+                # print("END")  # DEBUG:
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
+                    # print("END")  # DEBUG:
             if event.type == pygame.MOUSEBUTTONUP:
                 self.new_game()
 
@@ -69,20 +78,22 @@ class Gomoku():
 
     def show_welcome_screen(self):
         rules = "The winner is first player whose form unbroken line"
-        rules2 = "of five stones horizontally, vertically or diagonally"
+        rules2 = "of exactly 5 stones horizontally, vertically or diagonally"
         action = "Click anywhere to start"
         self.draw_screen(action, rules, rules2)
 
     def show_gameover_screen(self):
         rules = None
-        if self.winner == 1 or self.winner == 2:
-            rules = "Won player " + str(self.winner)
+        if self.winner == PLAYER_1:
+            rules = "Won Human"
+        elif self.winner == PLAYER_2:
+            rules = "Won computer"
         elif self.winner == PLAYER_DRAW:
             rules = "Draw. There is no winner"
         else:
             rules = "You are still playing"
-        rules2 = "Player1    " + str(self.player1_wins)\
-        + " : " + str(self.player2_wins) + "    Player 2"
+        rules2 = "Human    " + str(self.player1_wins)\
+        + " : " + str(self.player2_wins) + "    computer"
         action = "Click anywhere to start next game"
         self.draw_screen(action, rules, rules2)
 
@@ -102,6 +113,7 @@ class Gomoku():
         rect = rendered_text.get_rect()
         rect.topleft = (x, y)
         surface.blit(rendered_text, rect)
+
 
 
 if __name__ == "__main__":
