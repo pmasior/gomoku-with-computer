@@ -132,6 +132,7 @@ class Computer(Player):
             return depth - 100
         elif earlier_player == PLAYER_2 and winner == True:
             return 100 - depth
+        # TODO: dodaj funkcje heurystycznej oceny ruchu np. lepsza niż 0 ocena dla 4 kamieni obok siebie
         # elif earlier_player == PLAYER_1:
         #     count = self.count_stones_near_coordinates(board_copy, n, m)
         #     print("count", -count)

@@ -25,14 +25,16 @@ def print_board(board, tekst = "default"):
             print()
     elif LOG_TO_FILE == 1:
         file = open("resgom.txt", "a")
-        file.write("\n print_board()", tekst)
+        file.write("\n print_board()" + tekst + "\n")
         for m in range(0, FIELDS):
             for n in range(0, FIELDS):
                 if board[n][m] != None:
-                    file.write(board[n][m], end=' ')
+                    file.write(str(board[n][m]))
+                    file.write(str(" "))
                 else:
-                    file.write("░", end=' ')
-            file.write("")
+                    file.write("░")
+                    file.write(str(" "))
+            file.write("\n")
         file.close()
 
 def draw_move(self, x, y):

@@ -20,7 +20,8 @@ class Tie():
         self.draw_background()
         self.draw_grid()
         self.run()
-        init_debug_file()
+        if LOG_TO_FILE == 1:
+            init_debug_file()
 
     def run(self):
         self.playing = True
@@ -56,6 +57,7 @@ class Tie():
             self.draw()
             if LOG_STATE_OF_BOARD > 0:
                 print_board(self.board, "Tie")
+            self.draw()
             self.end_if_gameover(n, m, self.board)
             self.change_player()
 
