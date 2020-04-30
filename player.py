@@ -60,6 +60,10 @@ class Computer(Player):
         super().__init__(screen, tie, number, color)
         self.next_move_n = None
         self.next_move_m = None
+        self.next_move_beta_n = None
+        self.next_move_beta_m = None
+        self.next_move_alfa_n = None
+        self.next_move_alfa_m = None
 
     def move(self):
         board_copy = copy.deepcopy(self.tie.board)
@@ -121,8 +125,7 @@ class Computer(Player):
     #                 count += 1
     #     return count
 
-    def score_in_alfa_beta(self, board_copy, n, m, depth, winner, draw):
-        # TODO: usuń niepotrzebne argumenty przy usuwaniu zakomentowanej oceny ruchu
+    def score_in_alfa_beta(self, board_copy, depth, winner, draw):
         if depth % 2 == 0:
             earlier_player = PLAYER_1
         elif depth % 2 == 1:
@@ -132,17 +135,6 @@ class Computer(Player):
             return depth - 100
         elif earlier_player == PLAYER_2 and winner == True:
             return 100 - depth
-        # TODO: dodaj funkcje heurystycznej oceny ruchu np. lepsza niż 0 ocena dla 4 kamieni obok siebie
-        # elif earlier_player == PLAYER_1:
-        #     count = self.count_stones_near_coordinates(board_copy, n, m)
-        #     print("count", -count)
-        #     return -count
-        # elif earlier_player == PLAYER_2:
-        #     count = self.count_stones_near_coordinates(board_copy, n, m)
-        #     print("count", count)
-        #     return count
-        # if winner == True:
-        #     return 100 - depth
         else:
             return 0
 
@@ -165,7 +157,6 @@ class Computer(Player):
 
 
     def alfa_beta(self, board_copy, alfa, beta, n = None, m = None, depth = 0):
-                  # alfa = [-math.inf, None, None], beta = [math.inf, None, None]):
         if LOG_STATE_OF_BOARD > 1:
             print_board(board_copy, "alfa_beta()")
         if depth % 2 == 0:
@@ -178,37 +169,49 @@ class Computer(Player):
         winner = self.tie.check_winner(n, m, board_copy, earlier_player)
         draw = self.tie.check_draw(board_copy)
         if winner == True or draw == True or depth == MAX_DEPTH:
-            score = self.score_in_alfa_beta(board_copy, n, m, depth, winner, draw)
+            score = self.score_in_alfa_beta(board_copy, depth, winner, draw)
             # print("ab+() d", depth, " v", score, " n", n, " m", m, " p", player, "ep", earlier_player, sep='')  # DEBUG:
             return score
 
         if player == PLAYER_2:
-            # alfa = -math.inf
             for empty_field in self.get_empty_and_near_stones_fields(board_copy):
-                n, m = empty_field
+                if self.next_move_beta_n == None and self.next_move_beta_m == None:
+                    n, m = empty_field
+                if self.next_move_beta_n != None and self.next_move_beta_m != None:
+                    n, m = self.next_move_beta_n, self.next_move_beta_m
                 board_copy[n][m] = player
                 value = self.alfa_beta(board_copy, alfa, beta, n, m, depth + 1)
                 # print("ab ()", " v", value, " n", n, " m", m, " p", player, " d", depth,  sep='')  # DEBUG:
                 board_copy[n][m] = None
+                if self.next_move_beta_n != None and self.next_move_beta_m != None:
+                    self.next_move_beta_n, self.next_move_beta_m = None, None
                 if value > alfa:
                     alfa = value
                 if alfa >= beta:
                     # print("ifβ", "*" * depth, beta)  # DEBUG:
+                    self.next_move_beta_n = n
+                    self.next_move_beta_m = m
                     return beta
             # print("if ", "*" * depth, alfa)  # DEBUG:
             return alfa
         elif player == PLAYER_1:
-            # beta = math.inf
             for empty_field in self.get_empty_and_near_stones_fields(board_copy):
-                n, m = empty_field
+                if self.next_move_alfa_n == None and self.next_move_alfa_m == None:
+                    n, m = empty_field
+                if self.next_move_alfa_n != None and self.next_move_alfa_m != None:
+                    n, m = self.next_move_alfa_n, self.next_move_alfa_m
                 board_copy[n][m] = player
                 value = self.alfa_beta(board_copy, alfa, beta, n, m, depth + 1)
                 # print("ab ()", " v", value, " n", n, " m", m, " p", player, " d", depth,  sep='')  # DEBUG:
                 board_copy[n][m] = None
+                if self.next_move_alfa_n != None and self.next_move_alfa_m != None:
+                    self.next_move_alfa_n, self.next_move_alfa_m = None, None
                 if value < beta:
                     beta = value
                 if alfa >= beta:
                     # print("ifα", "*" * depth, alfa)  # DEBUG:
+                    self.next_move_alfa_n = n
+                    self.next_move_alfa_m = m
                     return alfa
             # print("if ", "*" * depth, beta)  # DEBUG:
             return beta
