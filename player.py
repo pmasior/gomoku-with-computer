@@ -140,6 +140,12 @@ class Computer(Player):
 
 
     def find_move(self, board_copy):
+        """ Wybiera następny ruch komputera
+
+        Wykorzystuje pętlę algorytmu minimax dla gracza MAX, żeby wyznaczyć
+        następny ruch komputera, który zostaje zapisany jako atrybut klasy
+        Computer
+        """
         alfa = -math.inf
         for empty_field in self.get_empty_and_near_stones_fields(board_copy):
             n, m = empty_field
@@ -157,6 +163,29 @@ class Computer(Player):
 
 
     def alfa_beta(self, board_copy, alfa, beta, n = None, m = None, depth = 0):
+        """ Alfa-beta z heurystyką zabójcy
+
+        Argumenty:
+        board_copy -- tablica z aktualnymi ruchami graczy
+        alfa -- największa wartość dla gracza MAX (komputera)
+        beta -- najmniejsza wartość dla gracza MIN (człowiek)
+        n -- współrzędne ostatniego ruchu (istotne w dalszych wywołaniach rek.)
+        m -- współrzędne ostatniego ruchu (istotne w dalszych wywołaniach rek.)
+        depth -- głębokość rekurencji
+        Algorytm minimax to algorytm przeszukujący w głąb drzewo, które na
+        kolejnych głębokościach,  zaczynając od najwyższego zawiera wszystkie
+        możliwe ruchy graczy.
+        Algorytm alfa-beta jest jego ulepszeniem. Zawiera on dodatkowo dwie
+        wartości α i β. Początkowo α = -∞ i β = ∞. W miarę przechodzenia do
+        kolejnych wywołań rekurencyjnych, α zwiększa się, a β zmiejsza się.
+        Gdy α ≥ β, to oznacza to, że wybór tej opcji nie będzie lepszy od
+        poprzednio zbadanych opcji, dlatego nie ma potrzeby dalszego
+        przeszukiwania tej gałęzi.
+        Heurystyka zabójcy (ang. killer heuristic) polega na zapamiętywaniu
+        ostatniego ruchu, który spowodował odcięcie gałęzi na określonej
+        głębokości, a następnie sprawdzenie tego ruchu w pierwszej kolejności
+        w kolejnych wywołaniach dla tej samej głębokości.
+        """
         if LOG_STATE_OF_BOARD > 1:
             print_board(board_copy, "alfa_beta()")
         if depth % 2 == 0:
