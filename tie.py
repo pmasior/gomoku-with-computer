@@ -6,9 +6,10 @@ import pygame
 from constants import *
 from player import *
 from develop import *
+from gui import *
 
 
-class Tie():
+class Tie(Gui):
     def __init__(self, screen, clock):
         self.screen = screen
         self.clock = clock
@@ -17,11 +18,14 @@ class Tie():
         self.all_sprites = pygame.sprite.Group()
         self.winner = None
         self.create_players()
-        self.draw_background()
+        self.draw_background(DARK_SAND)
         self.draw_grid()
+        self.draw()
+        self.show_actual_player()
         self.run()
         if LOG_TO_FILE == 1:
             init_debug_file()
+
 
     def run(self):
         self.playing = True
@@ -31,22 +35,26 @@ class Tie():
             self.update()
             self.draw()
 
+
     def events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
             if event.type == pygame.MOUSEBUTTONUP:
-                if self.next_player == PLAYER_1:
+                if self.next_player == HUMAN:
                     self.move_human()
+
 
     def update(self):
         self.all_sprites.update()
-        if self.next_player == PLAYER_2:
+        if self.next_player == COMPUTER:
             self.move_computer()
+
 
     def draw(self):
         pygame.display.flip()
         self.all_sprites.draw(self.screen)
+
 
     def move_human(self):
         (mouse_x, mouse_y) = pygame.mouse.get_pos()
@@ -60,6 +68,8 @@ class Tie():
             self.draw()
             self.end_if_gameover(n, m, self.board)
             self.change_player()
+            self.show_actual_player()
+
 
     def move_computer(self):
         n, m = self.player2.move()
@@ -67,6 +77,8 @@ class Tie():
             print_board(self.board, "Tie")
         self.end_if_gameover(n, m, self.board)
         self.change_player()
+        self.show_actual_player()
+
 
     def end_if_gameover(self, n, m, board):
         if self.check_winner(n, m, board, self.next_player):
@@ -74,6 +86,7 @@ class Tie():
             self.playing = False
         if self.check_draw(board):
             self.playing = False
+
 
     def check_winner(self, n, m, board, player):
         """ Sprawdza czy koniec gry (wygrana lub remis)
@@ -96,6 +109,7 @@ class Tie():
                self.check_winner_diagonally1(n, m, out_extent, board, player) or \
                self.check_winner_diagonally2(n, m, out_extent, board, player):
                 return True
+
 
     def check_winner_horizontally(self, n, m, out_extent, board, player):
         """ Sprawdza czy wygrana w poziomie
@@ -124,6 +138,7 @@ class Tie():
                 return True
         return False
 
+
     def check_winner_vertically(self, n, m, out_extent, board, player):
         """ Sprawdza czy wygrana w pionie """
         top = m - 2 + out_extent
@@ -148,6 +163,7 @@ class Tie():
         # print("f3")  # DEBUG:
         return False
 
+
     def check_winner_diagonally1(self, n, m, out_extent, board, player):
         """ Sprawdza czy wygrana po przekątnej \ """
         left = n - 2 + out_extent
@@ -169,6 +185,7 @@ class Tie():
                player:
                 return True
         return False
+
 
     def check_winner_diagonally2(self, n, m, out_extent, board, player):
         """ Sprawdza czy wygrana po przekątnej / """
@@ -192,29 +209,23 @@ class Tie():
                 return True
         return False
 
+
     def check_draw(self, board):
-        if sum([j.count(PLAYER_1) + j.count(PLAYER_2) for j in board]) > (FIELDS-1)**2:
+        if sum([j.count(HUMAN) + j.count(COMPUTER) for j in board]) > (FIELDS-1)**2:
             self.winner = PLAYER_DRAW
             return True
 
+
     def change_player(self):
-        if self.next_player == PLAYER_1:
-            self.next_player = PLAYER_2
-        elif self.next_player == PLAYER_2:
-            self.next_player = PLAYER_1
+        if self.next_player == HUMAN:
+            self.next_player = COMPUTER
+        elif self.next_player == COMPUTER:
+            self.next_player = HUMAN
 
-    def draw_background(self):
-        self.screen.fill(DARK_SAND)
-
-    def draw_grid(self):
-        """ Rysuje pionowe i poziome linie """
-        for c in range(GRID_BEGIN, GRID_END, GRID_TILESIZE):
-            pygame.draw.line(self.screen, SAND, (c, GRID_BEGIN), (c, GRID_END), 2)
-            pygame.draw.line(self.screen, SAND, (GRID_BEGIN, c), (GRID_END, c), 2)
 
     def create_players(self):
-        self.player1 = Human(self.screen, self, PLAYER_1, BLACK)
-        self.player2 = Computer(self.screen, self, PLAYER_2, WHITE)
+        self.player1 = Human(self.screen, self, HUMAN, BLACK)
+        self.player2 = Computer(self.screen, self, COMPUTER, WHITE)
 
 
 

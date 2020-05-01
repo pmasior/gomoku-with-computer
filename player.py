@@ -8,7 +8,7 @@ import copy
 
 from constants import *
 from develop import *
-
+from stone import *
 
 
 class Player():
@@ -19,13 +19,16 @@ class Player():
         self.color = color
         self.stone_sprites = pygame.sprite.Group()
 
+
     def check_if_field_is_empty(self, n, m, board):
         if board[n][m] == None:
             return True
         return False
 
+
     def write_move(self, n, m):
         self.tie.board[n][m] = self.number
+
 
     def draw_move(self, x, y):
         stone = Stone(self.color, x, y)
@@ -38,15 +41,16 @@ class Human(Player):
     def move(self, mouse_x, mouse_y):
         """ Sprawdza czy ruch jest dozwolony, jeśli jest to go wykonuje """
         for m in range(0, FIELDS):
-            y = GRID_BEGIN + m * GRID_TILESIZE
+            y = GRID_Y_BEGIN + m * GRID_TILESIZE
             for n in range(0, FIELDS):
-                x = GRID_BEGIN + n * GRID_TILESIZE
+                x = GRID_X_BEGIN + n * GRID_TILESIZE
                 if self.check_if_clicked_in_field(x, y, mouse_x, mouse_y) and \
                    self.check_if_field_is_empty(n, m, self.tie.board):
                     self.write_move(n, m)
                     self.draw_move(x, y)
                     return n, m
         return None, None
+
 
     def check_if_clicked_in_field(self, x, y, mouse_x, mouse_y):
         if math.hypot(mouse_x - x, mouse_y - y) < STONE_RADIUS:
@@ -63,18 +67,21 @@ class Computer(Player):
         self.next_move_beta_n = None
         self.next_move_beta_m = None
 
+
     def move(self):
         board_copy = copy.deepcopy(self.tie.board)
         self.find_move(board_copy)
-        x = GRID_BEGIN + self.next_move_n * GRID_TILESIZE
-        y = GRID_BEGIN + self.next_move_m * GRID_TILESIZE
+        x = GRID_X_BEGIN + self.next_move_n * GRID_TILESIZE
+        y = GRID_Y_BEGIN + self.next_move_m * GRID_TILESIZE
         self.write_move(self.next_move_n, self.next_move_m)
         self.draw_move(x, y)
         return self.next_move_n, self.next_move_m
 
+
     # def get_empty_fields(self, board_copy):
     #     """ Zwraca tablicę ze współrzędnymi pustych pól """
     #     return [(i, j) for i in range(FIELDS) for j in range(FIELDS) if self.check_if_field_is_empty(i, j, board_copy)]
+
 
     def get_empty_and_near_stones_fields(self, board_copy):
         """ Zwraca tablicę ze współrzędnymi pustych pól otorzonych kamieniami
@@ -90,6 +97,7 @@ class Computer(Player):
                     self.add_empty_fields_to_set(board_copy, i, j, fields)
         return fields
 
+
     def improve_range_of_array(self, board_copy, left, right, top, bottom):
         """ Zapewnia, że współrzędne nie wychodzą poza zakres tablicy """
         while left < 0:
@@ -101,6 +109,7 @@ class Computer(Player):
         while bottom >= FIELDS:
             bottom -= 1
         return left, top, right, bottom
+
 
     def add_empty_fields_to_set(self, board_copy, n, m, fields, area = 1):  # area 1 lub 3 lub 4
         left, top, right, bottom = \
@@ -114,13 +123,13 @@ class Computer(Player):
 
     def score_in_alfa_beta(self, board_copy, depth, winner, draw):
         if depth % 2 == 0:
-            earlier_player = PLAYER_1
+            earlier_player = HUMAN
         elif depth % 2 == 1:
-            earlier_player = PLAYER_2
+            earlier_player = COMPUTER
 
-        if earlier_player == PLAYER_1 and winner == True:
+        if earlier_player == HUMAN and winner == True:
             return depth - 100
-        elif earlier_player == PLAYER_2 and winner == True:
+        elif earlier_player == COMPUTER and winner == True:
             return 100 - depth
         else:
             return 0
@@ -136,7 +145,7 @@ class Computer(Player):
         alfa = -math.inf
         for empty_field in self.get_empty_and_near_stones_fields(board_copy):
             n, m = empty_field
-            board_copy[n][m] = PLAYER_2
+            board_copy[n][m] = COMPUTER
             value = self.alfa_beta(board_copy, alfa, math.inf, n, m, 1)
             board_copy[n][m] = None
             if value > alfa:
@@ -176,11 +185,11 @@ class Computer(Player):
         if LOG_STATE_OF_BOARD > 1:
             print_board(board_copy, "alfa_beta()")
         if depth % 2 == 0:
-            player = PLAYER_2
-            earlier_player = PLAYER_1
+            player = COMPUTER
+            earlier_player = HUMAN
         elif depth % 2 == 1:
-            player = PLAYER_1
-            earlier_player = PLAYER_2
+            player = HUMAN
+            earlier_player = COMPUTER
 
         winner = self.tie.check_winner(n, m, board_copy, earlier_player)
         draw = self.tie.check_draw(board_copy)
@@ -189,7 +198,7 @@ class Computer(Player):
             # print("ab+() d", depth, " v", score, " n", n, " m", m, " p", player, "ep", earlier_player, sep='')  # DEBUG:
             return score
 
-        if player == PLAYER_2:
+        if player == COMPUTER:
             for empty_field in self.get_empty_and_near_stones_fields(board_copy):
                 if self.next_move_beta_n == None and self.next_move_beta_m == None:
                     n, m = empty_field
@@ -210,7 +219,7 @@ class Computer(Player):
                     return beta
             # print("if ", "*" * depth, alfa)  # DEBUG:
             return alfa
-        elif player == PLAYER_1:
+        elif player == HUMAN:
             for empty_field in self.get_empty_and_near_stones_fields(board_copy):
                 n, m = empty_field
                 board_copy[n][m] = player
@@ -224,24 +233,6 @@ class Computer(Player):
                     return alfa
             # print("if ", "*" * depth, beta)  # DEBUG:
             return beta
-
-
-
-class Stone(pygame.sprite.Sprite):
-    def __init__(self, color, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
-        self.color = color
-        self.set_image()
-
-    def set_image(self):
-        if self.color == WHITE:
-            self.image = pygame.image.load(IMG_WHITE_STONE)
-        elif self.color == BLACK:
-            self.image = pygame.image.load(IMG_BLACK_STONE)
-        self.rect = self.image.get_rect()
-        self.rect.center = (self.x, self.y)
 
 
 
