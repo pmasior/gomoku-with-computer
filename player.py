@@ -60,6 +60,8 @@ class Computer(Player):
         super().__init__(screen, tie, number, color)
         self.next_move_n = None
         self.next_move_m = None
+        self.next_move_beta_n = None
+        self.next_move_beta_m = None
 
     def move(self):
         board_copy = copy.deepcopy(self.tie.board)
@@ -109,20 +111,8 @@ class Computer(Player):
                     # print("(", i, ", ", j, ")", sep = '', end = '')  # DEBUG:
                     fields.add((i, j))
 
-    # def count_stones_near_coordinates(self, board_copy, n, m, area = 1):  # area 1 lub 3 lub 4
-    #     left, top, right, bottom = \
-    #         self.improve_range_of_array(board_copy, n - area, n + area, m - area, m + area)
-    #     # print("count_stones from: ", n, m, ">", end='')  # DEBUG:
-    #     count = 0
-    #     for i in range(left, right + 1):
-    #         for j in range(top, bottom + 1):
-    #             if self.check_if_field_is_empty(i, j, board_copy) == False:
-    #                 # print("(", i, j, ")", end=" ")  # DEBUG:
-    #                 count += 1
-    #     return count
 
-    def score_in_alfa_beta(self, board_copy, n, m, depth, winner, draw):
-        # TODO: usuń niepotrzebne argumenty przy usuwaniu zakomentowanej oceny ruchu
+    def score_in_alfa_beta(self, board_copy, depth, winner, draw):
         if depth % 2 == 0:
             earlier_player = PLAYER_1
         elif depth % 2 == 1:
@@ -132,22 +122,17 @@ class Computer(Player):
             return depth - 100
         elif earlier_player == PLAYER_2 and winner == True:
             return 100 - depth
-        # TODO: dodaj funkcje heurystycznej oceny ruchu np. lepsza niż 0 ocena dla 4 kamieni obok siebie
-        # elif earlier_player == PLAYER_1:
-        #     count = self.count_stones_near_coordinates(board_copy, n, m)
-        #     print("count", -count)
-        #     return -count
-        # elif earlier_player == PLAYER_2:
-        #     count = self.count_stones_near_coordinates(board_copy, n, m)
-        #     print("count", count)
-        #     return count
-        # if winner == True:
-        #     return 100 - depth
         else:
             return 0
 
 
     def find_move(self, board_copy):
+        """ Wybiera następny ruch komputera
+
+        Wykorzystuje pętlę algorytmu minimax dla gracza MAX, żeby wyznaczyć
+        następny ruch komputera, który zostaje zapisany jako atrybut klasy
+        Computer
+        """
         alfa = -math.inf
         for empty_field in self.get_empty_and_near_stones_fields(board_copy):
             n, m = empty_field
@@ -165,7 +150,29 @@ class Computer(Player):
 
 
     def alfa_beta(self, board_copy, alfa, beta, n = None, m = None, depth = 0):
-                  # alfa = [-math.inf, None, None], beta = [math.inf, None, None]):
+        """ Alfa-beta z heurystyką zabójcy
+
+        Argumenty:
+        board_copy -- tablica z aktualnymi ruchami graczy
+        alfa -- największa wartość dla gracza MAX (komputera)
+        beta -- najmniejsza wartość dla gracza MIN (człowiek)
+        n -- współrzędne ostatniego ruchu (istotne w dalszych wywołaniach rek.)
+        m -- współrzędne ostatniego ruchu (istotne w dalszych wywołaniach rek.)
+        depth -- głębokość rekurencji
+        Algorytm minimax to algorytm przeszukujący w głąb drzewo, które na
+        kolejnych głębokościach,  zaczynając od najwyższego zawiera wszystkie
+        możliwe ruchy graczy.
+        Algorytm alfa-beta jest jego ulepszeniem. Zawiera on dodatkowo dwie
+        wartości α i β. Początkowo α = -∞ i β = ∞. W miarę przechodzenia do
+        kolejnych wywołań rekurencyjnych, α zwiększa się, a β zmiejsza się.
+        Gdy α ≥ β, to oznacza to, że wybór tej opcji nie będzie lepszy od
+        poprzednio zbadanych opcji, dlatego nie ma potrzeby dalszego
+        przeszukiwania tej gałęzi.
+        Heurystyka zabójcy (ang. killer heuristic) polega na zapamiętywaniu
+        ostatniego ruchu, który spowodował odcięcie gałęzi na określonej
+        głębokości, a następnie sprawdzenie tego ruchu w pierwszej kolejności
+        w kolejnych wywołaniach dla tej samej głębokości.
+        """
         if LOG_STATE_OF_BOARD > 1:
             print_board(board_copy, "alfa_beta()")
         if depth % 2 == 0:
@@ -178,27 +185,32 @@ class Computer(Player):
         winner = self.tie.check_winner(n, m, board_copy, earlier_player)
         draw = self.tie.check_draw(board_copy)
         if winner == True or draw == True or depth == MAX_DEPTH:
-            score = self.score_in_alfa_beta(board_copy, n, m, depth, winner, draw)
+            score = self.score_in_alfa_beta(board_copy, depth, winner, draw)
             # print("ab+() d", depth, " v", score, " n", n, " m", m, " p", player, "ep", earlier_player, sep='')  # DEBUG:
             return score
 
         if player == PLAYER_2:
-            # alfa = -math.inf
             for empty_field in self.get_empty_and_near_stones_fields(board_copy):
-                n, m = empty_field
+                if self.next_move_beta_n == None and self.next_move_beta_m == None:
+                    n, m = empty_field
+                if self.next_move_beta_n != None and self.next_move_beta_m != None:
+                    n, m = self.next_move_beta_n, self.next_move_beta_m
                 board_copy[n][m] = player
                 value = self.alfa_beta(board_copy, alfa, beta, n, m, depth + 1)
                 # print("ab ()", " v", value, " n", n, " m", m, " p", player, " d", depth,  sep='')  # DEBUG:
                 board_copy[n][m] = None
+                if self.next_move_beta_n != None and self.next_move_beta_m != None:
+                    self.next_move_beta_n, self.next_move_beta_m = None, None
                 if value > alfa:
                     alfa = value
                 if alfa >= beta:
                     # print("ifβ", "*" * depth, beta)  # DEBUG:
+                    self.next_move_beta_n = n
+                    self.next_move_beta_m = m
                     return beta
             # print("if ", "*" * depth, alfa)  # DEBUG:
             return alfa
         elif player == PLAYER_1:
-            # beta = math.inf
             for empty_field in self.get_empty_and_near_stones_fields(board_copy):
                 n, m = empty_field
                 board_copy[n][m] = player
