@@ -47,19 +47,19 @@ class Tie(Gui):
                     self.playing = False
                 if self.next_player == HUMAN:
                     self.move_human()
+                if self.next_player == COMPUTER:
+                    self.move_computer()
                 # if event.button == 3:  # DEBUG:
                 #     self.show_end_state_of_game()  # DEBUG:
 
 
     def update(self):
         self.all_sprites.update()
-        if self.next_player == COMPUTER:
-            self.move_computer()
 
 
     def draw(self):
-        pygame.display.flip()
         self.all_sprites.draw(self.screen)
+        pygame.display.flip()
 
 
     def move_human(self):
@@ -68,16 +68,15 @@ class Tie(Gui):
         if n != None and m != None:
             # if self.next_player == 1:  # DEBUG:
             #     print("if 1")  # DEBUG:
-            self.draw()
-            self.draw()
             if LOG_STATE_OF_BOARD > 0:
                 print_board(self.board, "Tie")
             self.end_if_gameover(n, m, self.board)
-            self.change_player()
             if self.winner == None:
+                self.change_player()
                 self.show_actual_player()
             self.last_move_n = n
             self.last_move_m = m
+            self.draw()
 
 
     def move_computer(self):
@@ -85,8 +84,8 @@ class Tie(Gui):
         if LOG_STATE_OF_BOARD > 0:
             print_board(self.board, "Tie")
         self.end_if_gameover(n, m, self.board)
-        self.change_player()
         if self.winner == None:
+            self.change_player()
             self.show_actual_player()
 
 
@@ -95,9 +94,11 @@ class Tie(Gui):
             self.winner = board[n][m]
             self.show_end_state_of_game()
             self.events()
+            self.next_player = None
         if self.check_draw(board):
             self.show_end_state_of_game()
             self.events()
+            self.next_player = None
 
 
     def check_winner(self, n, m, board, player):
