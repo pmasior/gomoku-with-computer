@@ -14,12 +14,13 @@ class Gui():
         pygame.display.set_caption(TITLE)
 
 
-    def draw_screen(self, action, rules, rules2 = None):
+    def draw_screen(self, action, rules, rules2 = None, rules3 = None):
         self.draw_background(DARK_GRAY)
         self.draw_text(self.screen, 100, 100, "Gomoku", 84, LIGHT_SAND)
-        self.draw_text(self.screen, 100, 250, rules, 28, LIGHT_SAND)
-        self.draw_text(self.screen, 100, 300, rules2, 28, LIGHT_SAND)
-        self.draw_text(self.screen, 100, 650, action, 28, LIGHT_SAND)
+        self.draw_text(self.screen, 100, 250, rules, 26, LIGHT_SAND)
+        self.draw_text(self.screen, 100, 300, rules2, 26, LIGHT_SAND)
+        self.draw_text(self.screen, 100, 350, rules3, 26, LIGHT_SAND)
+        self.draw_text(self.screen, 100, 700, action, 26, LIGHT_SAND)
 
 
     def draw_background(self, color):
@@ -42,6 +43,20 @@ class Gui():
             rect2 = self.draw_text(self.screen, 50, 25, "Human", 28, DARK_GRAY)
         elif self.next_player == COMPUTER:
             rect2 = self.draw_text(self.screen, 50, 25, "computer", 28, WHITE)
+        pygame.display.update(rect2)
+
+
+    def show_end_state_of_game(self):
+        rect1 = pygame.draw.rect(self.screen, DARK_GRAY, ((0, 0), (800, 75)))
+        pygame.display.update(rect1)
+        if self.winner == HUMAN:
+            rect2 = self.draw_text(self.screen, 50, 15, "Won Human", 36, DARK_GRAY)
+        elif self.winner == COMPUTER:
+            rect2 = self.draw_text(self.screen, 50, 15, "Won computer", 36, WHITE)
+        elif self.winner == PLAYER_DRAW:
+            rect2 = self.draw_text(self.screen, 50, 15, "Draw", 36, SAND)
+        else:
+            rect2 = self.draw_text(self.screen, 50, 15, "Testy", 36, SAND)
         pygame.display.update(rect2)
 
 
@@ -79,4 +94,4 @@ class Gui():
 
 
 if __name__ == "__main__":
-    game = Gomoku()
+    print("You should run gomoku.py file")

@@ -24,4 +24,4 @@ class Stone(pygame.sprite.Sprite):
 
 
 if __name__ == "__main__":
-    game = Gomoku()
+    print("You should run gomoku.py file")

@@ -43,6 +43,10 @@ class Tie(Gui):
             if event.type == pygame.MOUSEBUTTONUP:
                 if self.next_player == HUMAN:
                     self.move_human()
+                if self.winner != None:
+                    self.playing = False
+                # if event.button == 3:  # DEBUG:
+                #     self.show_end_state_of_game()  # DEBUG:
 
 
     def update(self):
@@ -68,7 +72,9 @@ class Tie(Gui):
             self.draw()
             self.end_if_gameover(n, m, self.board)
             self.change_player()
-            self.show_actual_player()
+            if self.winner == None:
+                self.show_actual_player()
+                self.events()
 
 
     def move_computer(self):
@@ -77,15 +83,17 @@ class Tie(Gui):
             print_board(self.board, "Tie")
         self.end_if_gameover(n, m, self.board)
         self.change_player()
-        self.show_actual_player()
+        if self.winner == None:
+            self.show_actual_player()
+            self.events()
 
 
     def end_if_gameover(self, n, m, board):
         if self.check_winner(n, m, board, self.next_player):
             self.winner = board[n][m]
-            self.playing = False
+            self.show_end_state_of_game()
         if self.check_draw(board):
-            self.playing = False
+            self.show_end_state_of_game()
 
 
     def check_winner(self, n, m, board, player):
