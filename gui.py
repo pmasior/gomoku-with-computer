@@ -50,13 +50,13 @@ class Gui():
         rect1 = pygame.draw.rect(self.screen, DARK_GRAY, ((0, 0), (800, 75)))
         pygame.display.update(rect1)
         if self.winner == HUMAN:
-            rect2 = self.draw_text(self.screen, 50, 15, "Won Human", 36, DARK_GRAY)
+            rect2 = self.draw_text(self.screen, 50, 15, "Won Human", 36, SAND)
         elif self.winner == COMPUTER:
-            rect2 = self.draw_text(self.screen, 50, 15, "Won computer", 36, WHITE)
+            rect2 = self.draw_text(self.screen, 50, 15, "Won computer", 36, SAND)
         elif self.winner == PLAYER_DRAW:
             rect2 = self.draw_text(self.screen, 50, 15, "Draw", 36, SAND)
-        else:
-            rect2 = self.draw_text(self.screen, 50, 15, "Testy", 36, SAND)
+        # else:  # DEBUG:
+            # rect2 = self.draw_text(self.screen, 50, 15, "Testy", 36, SAND)  # DEBUG: 
         pygame.display.update(rect2)
 
 
