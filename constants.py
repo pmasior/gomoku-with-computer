@@ -23,7 +23,7 @@ PLAYER_DRAW = 3
 
 FIELDS = 15
 STONE_RADIUS = 23
-MAX_DEPTH = 4  # zalecane: 4
+MAX_DEPTH = 5  # zalecane: 5; opcjonalnie: 4
 
 GRID_MARGIN = 50
 GRID_SIZE = 700

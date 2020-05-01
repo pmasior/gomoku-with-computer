@@ -68,9 +68,9 @@ class Computer(Player):
         self.next_move_beta_m = None
 
 
-    def move(self):
+    def move(self, last_move_n, last_move_m):
         board_copy = copy.deepcopy(self.tie.board)
-        self.find_move(board_copy)
+        self.find_move(board_copy, last_move_n, last_move_m)
         x = GRID_X_BEGIN + self.next_move_n * GRID_TILESIZE
         y = GRID_Y_BEGIN + self.next_move_m * GRID_TILESIZE
         self.write_move(self.next_move_n, self.next_move_m)
@@ -135,7 +135,7 @@ class Computer(Player):
             return 0
 
 
-    def find_move(self, board_copy):
+    def find_move(self, board_copy, last_move_n, last_move_m):
         """ Wybiera następny ruch komputera
 
         Wykorzystuje pętlę algorytmu minimax dla gracza MAX, żeby wyznaczyć
@@ -143,6 +143,16 @@ class Computer(Player):
         Computer
         """
         alfa = -math.inf
+        fields = set()
+        self.add_empty_fields_to_set(board_copy, last_move_n, last_move_m, fields, 1)
+        for empty_field in fields:
+            n, m = empty_field
+            board_copy[n][m] = COMPUTER
+            value = self.alfa_beta(board_copy, alfa, math.inf, n, m, 1)
+            board_copy[n][m] = None
+            if value > alfa:
+                alfa = value
+                self.next_move_n, self.next_move_m = n, m
         for empty_field in self.get_empty_and_near_stones_fields(board_copy):
             n, m = empty_field
             board_copy[n][m] = COMPUTER

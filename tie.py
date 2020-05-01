@@ -17,6 +17,8 @@ class Tie(Gui):
         self.board = [[None for n in range(FIELDS)] for m in range(FIELDS)]
         self.all_sprites = pygame.sprite.Group()
         self.winner = None
+        self.last_move_n = None
+        self.last_move_m = None
         self.create_players()
         self.draw_background(DARK_SAND)
         self.draw_grid()
@@ -41,10 +43,10 @@ class Tie(Gui):
             if event.type == pygame.QUIT:
                 self.playing = False
             if event.type == pygame.MOUSEBUTTONUP:
-                if self.next_player == HUMAN:
-                    self.move_human()
                 if self.winner != None:
                     self.playing = False
+                if self.next_player == HUMAN:
+                    self.move_human()
                 # if event.button == 3:  # DEBUG:
                 #     self.show_end_state_of_game()  # DEBUG:
 
@@ -67,33 +69,35 @@ class Tie(Gui):
             # if self.next_player == 1:  # DEBUG:
             #     print("if 1")  # DEBUG:
             self.draw()
+            self.draw()
             if LOG_STATE_OF_BOARD > 0:
                 print_board(self.board, "Tie")
-            self.draw()
             self.end_if_gameover(n, m, self.board)
             self.change_player()
             if self.winner == None:
                 self.show_actual_player()
-                self.events()
+            self.last_move_n = n
+            self.last_move_m = m
 
 
     def move_computer(self):
-        n, m = self.player2.move()
+        n, m = self.player2.move(self.last_move_n, self.last_move_m)
         if LOG_STATE_OF_BOARD > 0:
             print_board(self.board, "Tie")
         self.end_if_gameover(n, m, self.board)
         self.change_player()
         if self.winner == None:
             self.show_actual_player()
-            self.events()
 
 
     def end_if_gameover(self, n, m, board):
         if self.check_winner(n, m, board, self.next_player):
             self.winner = board[n][m]
             self.show_end_state_of_game()
+            self.events()
         if self.check_draw(board):
             self.show_end_state_of_game()
+            self.events()
 
 
     def check_winner(self, n, m, board, player):
