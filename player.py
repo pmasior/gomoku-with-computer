@@ -64,8 +64,6 @@ class Computer(Player):
         super().__init__(screen, tie, number, color)
         self.next_move_n = None
         self.next_move_m = None
-        self.next_move_beta_n = None
-        self.next_move_beta_m = None
 
 
     def move(self, last_move_n, last_move_m):
@@ -192,6 +190,8 @@ class Computer(Player):
                     score = max(score, 40)
                 elif me_s == 2 and none_s == 3 and ((tab[i] == opponent_n) != (tab[-1] == opponent_n)):
                     score = max(score, 30)
+                elif me_s == 1 and none_s == 5:
+                    score = max(score, 20)
                 else:
                     score = max(score, 0)
         if earlier_player == HUMAN:
