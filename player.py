@@ -208,9 +208,9 @@ class Computer(Player):
         Computer
         """
         alfa = -math.inf
-        fields = set()
-        self.add_empty_fields_to_set(board_copy, last_move_n, last_move_m, fields, 1)
-        for empty_field in fields:
+        fields_near_last_move = set()
+        self.add_empty_fields_to_set(board_copy, last_move_n, last_move_m, fields_near_last_move, 1)
+        for empty_field in fields_near_last_move:
             n, m = empty_field
             board_copy[n][m] = COMPUTER
             value = self.alfa_beta(board_copy, alfa, math.inf, n, m, 1)
@@ -218,7 +218,9 @@ class Computer(Player):
             if value > alfa:
                 alfa = value
                 self.next_move_n, self.next_move_m = n, m
-        for empty_field in self.get_empty_and_near_stones_fields(board_copy):
+        rest_of_fields = self.get_empty_and_near_stones_fields(board_copy)
+        rest_of_fields -= fields_near_last_move
+        for empty_field in rest_of_fields:
             n, m = empty_field
             board_copy[n][m] = COMPUTER
             value = self.alfa_beta(board_copy, alfa, math.inf, n, m, 1)
