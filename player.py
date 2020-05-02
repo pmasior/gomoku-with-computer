@@ -78,9 +78,21 @@ class Computer(Player):
         return self.next_move_n, self.next_move_m
 
 
-    # def get_empty_fields(self, board_copy):
-    #     """ Zwraca tablicę ze współrzędnymi pustych pól """
-    #     return [(i, j) for i in range(FIELDS) for j in range(FIELDS) if self.check_if_field_is_empty(i, j, board_copy)]
+    def get_empty_fields(self, board_copy):
+        """ Zwraca tablicę ze współrzędnymi pustych pól """
+        # return [(i, j) for i in range(FIELDS) for j in range(FIELDS) if self.check_if_field_is_empty(i, j, board_copy)]
+        fields = set()
+        for i in range(FIELDS):
+            for j in range(FIELDS):
+                if self.check_if_field_is_empty(i, j, board_copy) == False:
+                    self.add_empty_fields_to_set(board_copy, i, j, fields)
+        fields = list(fields)
+        for i in range(FIELDS):
+            for j in range(FIELDS):
+                if self.check_if_field_is_empty(i, j, board_copy):
+                    if (i, j) not in fields:
+                        fields.append((i, j))
+        return fields
 
 
     def get_empty_and_near_stones_fields(self, board_copy):
@@ -95,6 +107,7 @@ class Computer(Player):
             for j in range(FIELDS):
                 if self.check_if_field_is_empty(i, j, board_copy) == False:
                     self.add_empty_fields_to_set(board_copy, i, j, fields)
+        # print("F", fields)  # DEBUG:
         return fields
 
 
@@ -121,7 +134,7 @@ class Computer(Player):
                     fields.add((i, j))
 
 
-    def score_in_alfa_beta(self, board_copy, depth, winner, draw):
+    def score_in_alfa_beta(self, board_copy, n, m, depth, winner, draw):
         if depth % 2 == 0:
             earlier_player = HUMAN
         elif depth % 2 == 1:
@@ -131,8 +144,60 @@ class Computer(Player):
             return depth - 100
         elif earlier_player == COMPUTER and winner == True:
             return 100 - depth
-        else:
-            return 0
+
+        horizontally = list()
+        vertically = list()
+        diagonally1 = list()
+        diagonally2 = list()
+        for i in range(-5, 5 + 1):
+            if n + i >= 0 and n + i < FIELDS:
+                horizontally.append(board_copy[n + i][m])
+            if m + i >= 0 and m + i < FIELDS:
+                vertically.append(board_copy[n][m + i])
+            if n + i >= 0 and n + i < FIELDS and m + i >= 0 and m + i < FIELDS:
+                diagonally1.append(board_copy[n + i][m + i])
+            if n - i >= 0 and n - i < FIELDS and m + i >= 0 and m + i < FIELDS:
+                diagonally2.append(board_copy[n - i][m + i])
+
+        score = 0
+        for tab in horizontally, vertically, diagonally1, diagonally2:
+            for i in range(0, 5 + 1):
+                human = tab[i:i+6].count(HUMAN)
+                computer = tab[i:i+6].count(COMPUTER)
+                none_s = tab[i:i+6].count(None)
+                if earlier_player == HUMAN:
+                    me_s = human
+                    opponent_s = computer
+                    me_n = HUMAN
+                    opponent_n = COMPUTER
+                elif earlier_player == COMPUTER:
+                    me_s = computer
+                    opponent_s = human
+                    me_n = COMPUTER
+                    opponent_n = HUMAN
+
+                if me_s == 4 and (tab[i] == None or tab[-1] == None):
+                    score = max(score, 80)
+                elif me_s == 4 and none_s == 2:
+                    score = max(score, 70)
+                elif me_s == 4 and ((tab[i] == opponent_n) != (tab[-1] == opponent_n)) and none_s == 1:  # != xor
+                    score = max(score, 70)
+                elif me_s == 3 and (tab[i] == None and tab[-1] == None) and none_s == 3:
+                    score = max(score, 60)
+                elif me_s == 3 and ((tab[i] == opponent_n) != (tab[-1] == opponent_n)) and none_s == 2:
+                    score = max(score, 50)
+                elif me_s == 3 and ((tab[i] == None) != (tab[-1] == None)) and none_s == 3:
+                    score = max(score, 50)
+                elif me_s == 2 and none_s == 4 and tab[i] == tab[i+1] == tab[i+4] == tab[i+5] == None:
+                    score = max(score, 40)
+                elif me_s == 2 and none_s == 3 and ((tab[i] == opponent_n) != (tab[-1] == opponent_n)):
+                    score = max(score, 30)
+                else:
+                    score = max(score, 0)
+        if earlier_player == HUMAN:
+            return depth - score
+        elif earlier_player == COMPUTER:
+            return score - depth
 
 
     def find_move(self, board_copy, last_move_n, last_move_m):
@@ -203,33 +268,30 @@ class Computer(Player):
 
         winner = self.tie.check_winner(n, m, board_copy, earlier_player)
         draw = self.tie.check_draw(board_copy)
+        # print("depth", depth)  # DEBUG:
         if winner == True or draw == True or depth == MAX_DEPTH:
-            score = self.score_in_alfa_beta(board_copy, depth, winner, draw)
+            score = self.score_in_alfa_beta(board_copy, n, m, depth, winner, draw)
             # print("ab+() d", depth, " v", score, " n", n, " m", m, " p", player, "ep", earlier_player, sep='')  # DEBUG:
             return score
 
         if player == COMPUTER:
+            value = -math.inf
             for empty_field in self.get_empty_and_near_stones_fields(board_copy):
-                if self.next_move_beta_n == None and self.next_move_beta_m == None:
-                    n, m = empty_field
-                if self.next_move_beta_n != None and self.next_move_beta_m != None:
-                    n, m = self.next_move_beta_n, self.next_move_beta_m
+                n, m = empty_field
                 board_copy[n][m] = player
                 value = self.alfa_beta(board_copy, alfa, beta, n, m, depth + 1)
                 # print("ab ()", " v", value, " n", n, " m", m, " p", player, " d", depth,  sep='')  # DEBUG:
                 board_copy[n][m] = None
-                if self.next_move_beta_n != None and self.next_move_beta_m != None:
-                    self.next_move_beta_n, self.next_move_beta_m = None, None
                 if value > alfa:
                     alfa = value
                 if alfa >= beta:
                     # print("ifβ", "*" * depth, beta)  # DEBUG:
-                    self.next_move_beta_n = n
-                    self.next_move_beta_m = m
                     return beta
+                    # break
             # print("if ", "*" * depth, alfa)  # DEBUG:
             return alfa
         elif player == HUMAN:
+            value = math.inf
             for empty_field in self.get_empty_and_near_stones_fields(board_copy):
                 n, m = empty_field
                 board_copy[n][m] = player
@@ -241,6 +303,7 @@ class Computer(Player):
                 if alfa >= beta:
                     # print("ifα", "*" * depth, alfa)  # DEBUG:
                     return alfa
+                    # break
             # print("if ", "*" * depth, beta)  # DEBUG:
             return beta
 

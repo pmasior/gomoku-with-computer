@@ -4,6 +4,7 @@
 from constants import *
 
 # grep -n 'if' resgom.txt
+# grep '.*Tie' -A 15 "resgom9.txt"
 # grep -n '1 1 1 1 1' resgom.txt
 # grep -n 'END' resgom.txt && grep -n 'LOSOWANIE' resgom.txt && grep -n -m 1 'ab.() .* v[^0]' resgom.txt
 # python3 gomoku.py > resgom.txt
