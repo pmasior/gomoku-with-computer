@@ -197,7 +197,7 @@ class Computer(Player):
                     elif me_s == 4 and line[0] == line[1] == None:
                         score = max(score, 80)
                     elif me_s == 4 and none_s == 2 and ((line[0] == None) != (line[-1] == None)):
-                        score = max(score, 80)
+                        score = max(score, 70)
                     elif me_s == 4 and none_s == 1 and ((line[0] == opponent_n) != (line[-1] == opponent_n)):
                         score = max(score, 70)
                     # elif line[0:3].count(me_n) == 3 and none_s == 3:
@@ -304,7 +304,7 @@ class Computer(Player):
                     alfa = value
                 if alfa >= beta:
                     # print("ifβ", "*" * depth, beta)  # DEBUG:
-                    # if value > 70:
+                    # if value == 97:
                     #     self.next_move_beta_n, self.next_move_beta_m = n, m
                     # elif self.next_move_beta_n != None and self.next_move_beta_m != None:
                     #     self.next_move_beta_n, self.next_move_beta_m = None, None
@@ -326,8 +326,10 @@ class Computer(Player):
                     beta = value
                 if alfa >= beta:
                     # print("ifα", "*" * depth, alfa)  # DEBUG:
-                    # if value < -90:
+                    # if value == -98:
                     #     self.next_move_beta_n, self.next_move_beta_m = n, m
+                    # elif self.next_move_beta_n != None and self.next_move_beta_m != None:
+                    #     self.next_move_beta_n, self.next_move_beta_m = None, None
                     return alfa
                     # break
             # print("if ", "*" * depth, beta)  # DEBUG:
