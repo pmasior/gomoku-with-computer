@@ -5,7 +5,8 @@ WIDTH = 800
 HEIGHT = 850
 FPS = 30
 
-LOG_STATE_OF_BOARD = 2  # 0 - brak logów; 1 - logi z tie(); 2 - logi z alfa_beta()
+LOG_STATE_OF_BOARD = 0  # 0 - brak logów; 1 - logi z tie(); 2 - logi z alfa_beta()
+    # !!! włączenie logów bardzo spowalnia działanie programu
 LOG_TO_FILE = 0  # 0 - na konsolę; 1 - do pliku gomres.txt
 
 LIGHT_GRAY = (221, 221, 221)
