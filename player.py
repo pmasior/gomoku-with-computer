@@ -78,7 +78,7 @@ class Computer(Player):
         return self.next_move_n, self.next_move_m
 
 
-    def new_get_empty_fields(self, board_copy, last_move_n = None, last_move_m = None, area = 1):
+    def new_get_empty_fields(self, board_copy, area = 1, last_move_n = None, last_move_m = None):
         """ Zwraca listę pustych pól
 
         Najpierw tworzy zbiór pustych pól wokół ostatniego ruchu człowieka,
@@ -154,6 +154,8 @@ class Computer(Player):
             return depth - 100
         elif earlier_player == COMPUTER and winner == True:
             return 100 - depth
+        # else:
+        #     return 0
 
         horizontally = list()
         vertically = list()
@@ -172,38 +174,52 @@ class Computer(Player):
         score = 0
         for tab in horizontally, vertically, diagonally1, diagonally2:
             for i in range(0, 5 + 1):
-                human = tab[i:i+6].count(HUMAN)
-                computer = tab[i:i+6].count(COMPUTER)
-                none_s = tab[i:i+6].count(None)
-                if earlier_player == HUMAN:
-                    me_s = human
-                    opponent_s = computer
-                    me_n = HUMAN
-                    opponent_n = COMPUTER
-                elif earlier_player == COMPUTER:
-                    me_s = computer
-                    opponent_s = human
-                    me_n = COMPUTER
-                    opponent_n = HUMAN
+                line = tab[i:i+6]
+                if len(line) == 6:
+                    human = line.count(HUMAN)
+                    computer = line.count(COMPUTER)
+                    none_s = line.count(None)
+                    if earlier_player == HUMAN:
+                        me_s = human
+                        opponent_s = computer
+                        me_n = HUMAN
+                        opponent_n = COMPUTER
+                    elif earlier_player == COMPUTER:
+                        me_s = computer
+                        opponent_s = human
+                        me_n = COMPUTER
+                        opponent_n = HUMAN
 
-                if me_s == 4 and (tab[i] == None or tab[-1] == None):
-                    score = max(score, 80)
-                elif me_s == 4 and none_s == 2:
-                    score = max(score, 70)
-                elif me_s == 4 and ((tab[i] == opponent_n) != (tab[-1] == opponent_n)) and none_s == 1:  # != xor
-                    score = max(score, 70)
-                elif me_s == 3 and (tab[i] == None and tab[-1] == None) and none_s == 3:
-                    score = max(score, 60)
-                elif me_s == 3 and ((tab[i] == opponent_n) != (tab[-1] == opponent_n)) and none_s == 2:
-                    score = max(score, 50)
-                elif me_s == 3 and ((tab[i] == None) != (tab[-1] == None)) and none_s == 3:
-                    score = max(score, 50)
-                elif me_s == 2 and none_s == 4 and tab[i] == tab[i+1] == tab[i+4] == tab[i+5] == None:
-                    score = max(score, 40)
-                elif me_s == 2 and none_s == 3 and ((tab[i] == opponent_n) != (tab[-1] == opponent_n)):
-                    score = max(score, 30)
-                elif me_s == 1 and none_s == 5:
-                    score = max(score, 20)
+                    if me_s == 4 and line[-2] == line[-1] == None:
+                        score = max(score, 80)
+                    elif me_s == 4 and line[0] == line[-1] == None:
+                        score = max(score, 80)
+                    elif me_s == 4 and line[0] == line[1] == None:
+                        score = max(score, 80)
+                    elif me_s == 4 and none_s == 2 and ((line[0] == None) != (line[-1] == None)):
+                        score = max(score, 80)
+                    elif me_s == 4 and none_s == 1 and ((line[0] == opponent_n) != (line[-1] == opponent_n)):
+                        score = max(score, 70)
+                    # elif line[0:3].count(me_n) == 3 and none_s == 3:
+                    #     score = max(score, 60)
+                    # elif line[1:4].count(me_n) == 3 and none_s == 3:
+                    #     score = max(score, 60)
+                    # elif line[2:5].count(me_n) == 3 and none_s == 3:
+                    #     score = max(score, 60)
+                    # elif line[3:6].count(me_n) == 3 and none_s == 3:
+                    #     score = max(score, 60)
+                    # elif me_s == 3 and none_s == 3 and line[0] == line[-1] == None:
+                    #     score = max(score, 50)
+                    # elif line[0:3].count(me_n) == 3 and none_s == 2 and line[0] == opponent_n:
+                    #     score = max(score, 50)
+                    # elif line[1:4].count(me_n) == 3 and none_s == 2 and ((line[0] == opponent_n) != (line[-1] == opponent_n)):
+                    #     score = max(score, 50)
+                    # elif line[2:5].count(me_n) == 3 and none_s == 2 and ((line[0] == opponent_n) != (line[-1] == opponent_n)):
+                    #     score = max(score, 50)
+                    # elif line[3:6].count(me_n) == 3 and none_s == 2 and line[-1] == opponent_n:
+                    #     score = max(score, 50)
+                    else:
+                        score = max(score, 0)
                 else:
                     score = max(score, 0)
         if earlier_player == HUMAN:
@@ -222,8 +238,7 @@ class Computer(Player):
         alfa = -math.inf
         # last_move_near_empty_fields, near_empty_fields, rest_empty_fields = \
         #     self.new_get_empty_fields(board_copy, last_move_n, last_move_m)
-        empty_fields = self.new_get_empty_fields(board_copy, last_move_n, last_move_m, 1)
-        # for empty_field in last_move_near_empty_fields:
+        empty_fields = self.new_get_empty_fields(board_copy, 3, last_move_n, last_move_m)
         for empty_field in empty_fields:
             n, m = empty_field
             board_copy[n][m] = COMPUTER
@@ -277,8 +292,10 @@ class Computer(Player):
 
         if player == COMPUTER:
             value = -math.inf
-            for empty_field in self.new_get_empty_fields(board_copy):
+            for empty_field in self.new_get_empty_fields(board_copy, 1):
                 n, m = empty_field
+                # if self.next_move_beta_n != None and self.next_move_beta_m != None:
+                #     n, m = self.next_move_beta_n, self.next_move_beta_m
                 board_copy[n][m] = player
                 value = self.alfa_beta(board_copy, alfa, beta, n, m, depth + 1)
                 # print("ab ()", " v", value, " n", n, " m", m, " p", player, " d", depth,  sep='')  # DEBUG:
@@ -287,14 +304,20 @@ class Computer(Player):
                     alfa = value
                 if alfa >= beta:
                     # print("ifβ", "*" * depth, beta)  # DEBUG:
+                    # if value > 70:
+                    #     self.next_move_beta_n, self.next_move_beta_m = n, m
+                    # elif self.next_move_beta_n != None and self.next_move_beta_m != None:
+                    #     self.next_move_beta_n, self.next_move_beta_m = None, None
                     return beta
                     # break
             # print("if ", "*" * depth, alfa)  # DEBUG:
             return alfa
         elif player == HUMAN:
             value = math.inf
-            for empty_field in self.new_get_empty_fields(board_copy):
+            for empty_field in self.new_get_empty_fields(board_copy, 1):
                 n, m = empty_field
+                # if self.next_move_beta_n != None and self.next_move_beta_m != None:
+                #     n, m = self.next_move_beta_n, self.next_move_beta_m
                 board_copy[n][m] = player
                 value = self.alfa_beta(board_copy, alfa, beta, n, m, depth + 1)
                 # print("ab ()", " v", value, " n", n, " m", m, " p", player, " d", depth,  sep='')  # DEBUG:
@@ -303,6 +326,8 @@ class Computer(Player):
                     beta = value
                 if alfa >= beta:
                     # print("ifα", "*" * depth, alfa)  # DEBUG:
+                    # if value < -90:
+                    #     self.next_move_beta_n, self.next_move_beta_m = n, m
                     return alfa
                     # break
             # print("if ", "*" * depth, beta)  # DEBUG:
