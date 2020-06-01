@@ -183,57 +183,60 @@ class Computer(Player):
         for tab in horizontally, vertically, diagonally1, diagonally2:
             for i in range(0, 5 + 1):
                 line = tab[i:i+6]
-                if len(line) == 6:
-                    none_s = line.count(c.EMPTY)
-                    if earlier_player == c.HUMAN:
-                        me_s = line.count(c.HUMAN)
-                        # opponent_s = line.count(COMPUTER)
-                        me_n = c.HUMAN
-                        opponent_n = c.COMPUTER
-                    elif earlier_player == c.COMPUTER:
-                        me_s = line.count(c.COMPUTER)
-                        # opponent_s = line.count(HUMAN)
-                        me_n = c.COMPUTER
-                        opponent_n = c.HUMAN
-
-                    if me_s == 4 and line[-2] == line[-1] is c.EMPTY:
-                        score = max(score, 80)
-                    elif me_s == 4 and line[0] == line[-1] is c.EMPTY:
-                        score = max(score, 80)
-                    elif me_s == 4 and line[0] == line[1] is c.EMPTY:
-                        score = max(score, 80)
-                    elif me_s == 4 and none_s == 2 and ((line[0] is c.EMPTY) != (line[-1] is c.EMPTY)):
-                        score = max(score, 70)
-                    elif me_s == 4 and none_s == 1 and ((line[0] == opponent_n) != (line[-1] == opponent_n)):
-                        score = max(score, 70)
-
-                    elif line[0:3].count(me_n) == 3 and none_s == 3:
-                        score = max(score, 60)
-                    elif line[1:4].count(me_n) == 3 and none_s == 3:
-                        score = max(score, 60)
-                    elif line[2:5].count(me_n) == 3 and none_s == 3:
-                        score = max(score, 60)
-                    elif line[3:6].count(me_n) == 3 and none_s == 3:
-                        score = max(score, 60)
-                    elif me_s == 3 and none_s == 3 and line[0] == line[-1] is c.EMPTY:
-                        score = max(score, 50)
-                    elif line[0:3].count(me_n) == 3 and none_s == 2 and line[0] == opponent_n:
-                        score = max(score, 50)
-                    elif line[1:4].count(me_n) == 3 and none_s == 2 and ((line[0] == opponent_n) != (line[-1] == opponent_n)):
-                        score = max(score, 50)
-                    elif line[2:5].count(me_n) == 3 and none_s == 2 and ((line[0] == opponent_n) != (line[-1] == opponent_n)):
-                        score = max(score, 50)
-                    elif line[3:6].count(me_n) == 3 and none_s == 2 and line[-1] == opponent_n:
-                        score = max(score, 50)
-                    else:
-                        score = max(score, 0)
-                else:
-                    score = max(score, 0)
+                temp_score = self.score_nonfinal_situation_in_line(line, earlier_player)
+                score = max(temp_score, score)
         if earlier_player == c.HUMAN:
             return depth - score
         if earlier_player == c.COMPUTER:
             return score - depth
         return None
+
+
+    def score_nonfinal_situation_in_line(self, line, earlier_player):
+        """Ocenia sytuację w jednej linii planszy przekazanej jako argument."""
+        if len(line) == 6:
+            none_s = line.count(c.EMPTY)
+            if earlier_player == c.HUMAN:
+                me_s = line.count(c.HUMAN)
+                # opponent_s = line.count(COMPUTER)
+                me_n = c.HUMAN
+                opponent_n = c.COMPUTER
+            elif earlier_player == c.COMPUTER:
+                me_s = line.count(c.COMPUTER)
+                # opponent_s = line.count(HUMAN)
+                me_n = c.COMPUTER
+                opponent_n = c.HUMAN
+
+            if me_s == 4 and line[-2] == line[-1] is c.EMPTY:
+                return 80
+            if me_s == 4 and line[0] == line[-1] is c.EMPTY:
+                return 80
+            if me_s == 4 and line[0] == line[1] is c.EMPTY:
+                return 80
+            if me_s == 4 and none_s == 2 and ((line[0] is c.EMPTY) != (line[-1] is c.EMPTY)):
+                return 70
+            if me_s == 4 and none_s == 1 and ((line[0] == opponent_n) != (line[-1] == opponent_n)):
+                return 70
+
+            if line[0:3].count(me_n) == 3 and none_s == 3:
+                return 60
+            if line[1:4].count(me_n) == 3 and none_s == 3:
+                return 60
+            if line[2:5].count(me_n) == 3 and none_s == 3:
+                return 60
+            if line[3:6].count(me_n) == 3 and none_s == 3:
+                return 60
+            if me_s == 3 and none_s == 3 and line[0] == line[-1] is c.EMPTY:
+                return 50
+            if line[0:3].count(me_n) == 3 and none_s == 2 and line[0] == opponent_n:
+                return 50
+            if line[1:4].count(me_n) == 3 and none_s == 2 and ((line[0] == opponent_n) != (line[-1] == opponent_n)):
+                return 50
+            if line[2:5].count(me_n) == 3 and none_s == 2 and ((line[0] == opponent_n) != (line[-1] == opponent_n)):
+                return 50
+            if line[3:6].count(me_n) == 3 and none_s == 2 and line[-1] == opponent_n:
+                return 50
+        return 0
 
 
     def find_move(self, board_copy, last_move_n, last_move_m):
