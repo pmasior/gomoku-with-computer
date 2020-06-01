@@ -26,7 +26,6 @@ class Gomoku(Gui):
         self.human_wins = 0
         self.computer_wins = 0
         self.player_draw = 0
-        self.last_winner = 0
         self.running = True
         self.winner = None
         self.tie = None
