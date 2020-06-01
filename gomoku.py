@@ -19,7 +19,7 @@ from tie import Tie  # pylint: disable=wrong-import-position
 # pylint: disable=E1101
 
 class Gomoku(Gui):
-    """Główna klasa uruchamiająca aplikację"""
+    """Główna klasa uruchamiająca aplikację."""
     def __init__(self):
         super().__init__()
         self.clock = pygame.time.Clock()
@@ -30,12 +30,16 @@ class Gomoku(Gui):
         self.running = True
         self.winner = None
         self.tie = None
+
+
+    def start(self):
+        """Uruchamia główną pętlę"""
         self.draw_welcome_screen()
         self.run()
 
 
     def run(self):
-        """Główna pętla programu"""
+        """Główna pętla programu."""
         self.running = True
         while self.running:
             self.clock.tick(c.FRAMES_PER_SECOND)
@@ -45,7 +49,7 @@ class Gomoku(Gui):
 
 
     def events(self):
-        """Obsługiwane zdarzenia podczas każdej pętli w run()"""
+        """Obsługiwane zdarzenia podczas każdej pętli w run()."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
@@ -58,29 +62,29 @@ class Gomoku(Gui):
 
 
     def update(self):
-        """Aktualizacja obiektów podczas każdej pętli w run()"""
+        """Aktualizacja obiektów podczas każdej pętli w run()."""
 
 
     def draw(self):
-        """Rysowanie obiektów na ekranie podczas każdej pętli w run()"""
+        """Rysowanie obiektów na ekranie podczas każdej pętli w run()."""
         pygame.display.flip()
 
 
     def new_game(self):
-        """Rozpoczyna nową turę"""
+        """Rozpoczyna nową turę."""
         self.winner = None
         self.tie = Tie(self.screen, self.clock)
         self.game_over()
 
 
     def game_over(self):
-        """Kończy turę"""
+        """Kończy turę."""
         self.save_last_game_status()
         self.draw_gameover_screen()
 
 
     def save_last_game_status(self):
-        """Zapisuje, któ©y gracz wygrał podczas ostatniej tury"""
+        """Zapisuje, któ©y gracz wygrał podczas ostatniej tury."""
         self.winner = self.tie.winner
         if self.winner == c.HUMAN:
             self.human_wins += 1
@@ -91,5 +95,11 @@ class Gomoku(Gui):
 
 
 
-if __name__ == "__main__":
+def main():
     game = Gomoku()
+    game.start()
+
+
+
+if __name__ == "__main__":
+    main()

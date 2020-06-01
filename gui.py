@@ -9,7 +9,7 @@ import constants as c
 # pylint: disable=E1101
 
 class Gui:
-    """Obsługa graficznego interfejsu użytkownika"""
+    """Obsługa graficznego interfejsu użytkownika."""
     def __init__(self):
         pygame.init()
         pygame.mixer.quit()  # avoid error when pygame CPU usage is 100%
@@ -18,7 +18,7 @@ class Gui:
 
 
     def draw_screen(self, action, rules, rules2=None, rules3=None):
-        """Rysowanie ekranu z tytułem i komunikatem"""
+        """Rysowanie ekranu z tytułem i komunikatem."""
         self.draw_background(c.DARK_GRAY)
         self.draw_text(self.screen, 100, 100, "Gomoku", 84, c.LIGHT_SAND)
         self.draw_text(self.screen, 100, 250, rules, 26, c.LIGHT_SAND)
@@ -28,12 +28,12 @@ class Gui:
 
 
     def draw_background(self, color):
-        """Rysowanie tła"""
+        """Rysowanie tła."""
         self.screen.fill(color)
 
 
     def draw_grid(self):
-        """ Rysuje pionowe i poziome linie """
+        """Rysuje pionowe i poziome linie."""
         for coor in range(c.GRID_X_BEGIN, c.GRID_X_END, c.GRID_TILESIZE): # pylint: disable=invalid-name
             pygame.draw.line(self.screen, c.SAND, (coor, c.GRID_Y_BEGIN), (coor, c.GRID_Y_END), 2)
         for coor in range(c.GRID_Y_BEGIN, c.GRID_Y_END, c.GRID_TILESIZE): # pylint: disable=invalid-name
@@ -41,7 +41,7 @@ class Gui:
 
 
     def show_actual_player(self):
-        """Pokazywanie aktualnego gracza w rogu ekranu podczas rozgrywki"""
+        """Pokazywanie aktualnego gracza w rogu ekranu podczas rozgrywki."""
         rect1 = pygame.draw.rect(self.screen, c.DARK_SAND, ((50, 25), (125, 40)))
         pygame.display.update(rect1)
         if self.next_player == c.HUMAN:
@@ -52,7 +52,7 @@ class Gui:
 
 
     def show_end_state_of_game(self):
-        """Pokazywanie paska w górnej części okna informującego o zakończeniu gry"""
+        """Pokazywanie paska w górnej części okna informującego o zakończeniu gry."""
         rect1 = pygame.draw.rect(self.screen, c.DARK_GRAY, ((0, 0), (800, 75)))
         pygame.display.update(rect1)
         if self.winner == c.HUMAN:
@@ -65,7 +65,7 @@ class Gui:
 
 
     def draw_text(self, surface, x, y, text, size, color, font_family=c.FONT_ICEBERG): # pylint: disable=invalid-name
-        """Rysowanie tekstu na ekranie"""
+        """Rysowanie tekstu na ekranie."""
         font = pygame.font.Font(font_family, size)
         rendered_text = font.render(text, True, color)
         rect = rendered_text.get_rect()
@@ -75,7 +75,7 @@ class Gui:
 
 
     def draw_welcome_screen(self):
-        """Pokazywanie ekranu powitalnego po uruchomieniu aplikacji"""
+        """Pokazywanie ekranu powitalnego po uruchomieniu aplikacji."""
         rules = "The winner is the first player whose form an unbroken line"
         rules2 = "of exactly 5 stones horizontally, vertically or diagonally"
         action = "Click anywhere to start"
@@ -83,7 +83,7 @@ class Gui:
 
 
     def draw_gameover_screen(self):
-        """Pokazywanie ekranu informującego o zakończeniu gry"""
+        """Pokazywanie ekranu informującego o zakończeniu gry."""
         rules = None
         if self.winner == c.HUMAN:
             rules = "Human won"

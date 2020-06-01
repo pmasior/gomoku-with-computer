@@ -8,7 +8,7 @@ import pygame
 import constants as c
 
 class Stone(pygame.sprite.Sprite):  # pylint: disable=too-few-public-methods
-    """Graficzna reprezentacja kamienia na planszy"""
+    """Graficzna reprezentacja kamienia na planszy."""
     def __init__(self, color, x, y):  # pylint: disable=invalid-name
         pygame.sprite.Sprite.__init__(self)
         self.x = x  # pylint: disable=invalid-name
@@ -17,7 +17,7 @@ class Stone(pygame.sprite.Sprite):  # pylint: disable=too-few-public-methods
         self.set_image()
 
     def set_image(self):
-        """Narysowanie kamienia na planszy"""
+        """Narysowanie kamienia na planszy."""
         if self.color == c.WHITE:
             self.image = pygame.image.load(c.IMG_WHITE_STONE)
         elif self.color == c.BLACK:

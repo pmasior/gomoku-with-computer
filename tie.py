@@ -12,7 +12,7 @@ from player import Human, Computer
 # pylint: disable=E1101
 
 class Tie(Gui):
-    """Reprezentacja planszy w Gomoku"""
+    """Reprezentacja planszy w Gomoku."""
     def __init__(self, screen, clock):
         self.screen = screen
         self.clock = clock
@@ -34,7 +34,7 @@ class Tie(Gui):
 
 
     def run(self):
-        """Główna pętla programu podczas trwania rozgrywki"""
+        """Główna pętla programu podczas trwania rozgrywki."""
         self.playing = True
         while self.playing:
             self.clock.tick(c.FRAMES_PER_SECOND)
@@ -44,7 +44,7 @@ class Tie(Gui):
 
 
     def events(self):
-        """Obsługiwane zdarzenia podczas każdej pętli w run()"""
+        """Obsługiwane zdarzenia podczas każdej pętli w run()."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
@@ -58,18 +58,18 @@ class Tie(Gui):
 
 
     def update(self):
-        """Aktualizacja obiektów podczas każdej pętli w run()"""
+        """Aktualizacja obiektów podczas każdej pętli w run()."""
         self.all_sprites.update()
 
 
     def draw(self):
-        """Rysowanie obiektów na ekranie podczas każdej pętli w run()"""
+        """Rysowanie obiektów na ekranie podczas każdej pętli w run()."""
         self.all_sprites.draw(self.screen)
         pygame.display.flip()
 
 
     def move_human(self):
-        """Wywołanie ruchu wykonywanego przez człowieka"""
+        """Wywołanie ruchu wykonywanego przez człowieka."""
         (mouse_x, mouse_y) = pygame.mouse.get_pos()
         n, m = self.human.move(mouse_x, mouse_y)  # pylint: disable=invalid-name
         if n is not None and m is not None:
@@ -85,7 +85,7 @@ class Tie(Gui):
 
 
     def move_computer(self):
-        """Wywołanie ruchu wykonywanego przez komputer"""
+        """Wywołanie ruchu wykonywanego przez komputer."""
         n, m = self.computer.move(self.last_move_n, self.last_move_m)  # pylint: disable=invalid-name
         if c.LOG_STATE_OF_BOARD > 0:
             print_board(self.board, "Tie")
@@ -96,7 +96,7 @@ class Tie(Gui):
 
 
     def end_if_gameover(self, n, m, board):  # pylint: disable=invalid-name
-        """Kończenie gry, jeśli wystąpił koniec gry"""
+        """Kończenie gry, jeśli wystąpił koniec gry."""
         if self.check_winning(n, m, board, self.next_player):
             self.winner = board[n][m]
             self.show_end_state_of_game()
@@ -109,7 +109,7 @@ class Tie(Gui):
 
 
     def check_winning(self, n, m, board, player):  # pylint: disable=invalid-name
-        """ Sprawdza czy koniec gry (wygrana lub remis)
+        """Sprawdza czy koniec gry (wygrana lub remis).
 
         Przyjmuje jako argument współrzędne ostatniego ruchu ostatniego gracza
         (różne niż None), następnie dla r równych -2, -1, 0, 1, 2 sprawdza czy
@@ -133,7 +133,7 @@ class Tie(Gui):
 
 
     def check_winning_horizontally(self, n, m, out_extent, board, player):  # pylint: disable=invalid-name
-        """ Sprawdza czy wygrana w poziomie
+        """Sprawdza czy wygrana w poziomie.
 
         Przyjmuje jako argument współrzędne ostatniego ruchu ostatniego gracza.
         Pomija sprawdzanie pól, które są poza planszą (_ < 0 lub _ >= FIELDS).
@@ -161,7 +161,7 @@ class Tie(Gui):
 
 
     def check_winning_vertically(self, n, m, out_extent, board, player):  # pylint: disable=invalid-name
-        """ Sprawdza czy wygrana w pionie """
+        """Sprawdza czy wygrana w pionie."""
         top = m - 2 + out_extent
         down = m + 2 + out_extent
         if top - 1 >= 0:
@@ -182,7 +182,7 @@ class Tie(Gui):
 
 
     def check_winning_diagonally1(self, n, m, out_extent, board, player):  # pylint: disable=invalid-name
-        """ Sprawdza czy wygrana po przekątnej \ """  # pylint: disable=anomalous-backslash-in-string
+        """Sprawdza czy wygrana po przekątnej \ ."""  # pylint: disable=anomalous-backslash-in-string
         left = n - 2 + out_extent
         right = n + 2 + out_extent
         top = m - 2 + out_extent
@@ -205,7 +205,7 @@ class Tie(Gui):
 
 
     def check_winning_diagonally2(self, n, m, out_extent, board, player):  # pylint: disable=invalid-name
-        """ Sprawdza czy wygrana po przekątnej / """
+        """Sprawdza czy wygrana po przekątnej / ."""
         left = n - 2 + (-out_extent)
         right = n + 2 + (-out_extent)
         top = m - 2 + out_extent
@@ -228,7 +228,7 @@ class Tie(Gui):
 
 
     def check_draw(self, board):
-        """Sprawdzanie czy wystąpił remis"""
+        """Sprawdzanie czy wystąpił remis."""
         if sum([j.count(c.HUMAN) + j.count(c.COMPUTER) for j in board]) > (c.FIELDS-1)**2:
             self.winner = c.PLAYER_DRAW
             return True
@@ -236,7 +236,7 @@ class Tie(Gui):
 
 
     def change_player(self):
-        """Zmiana gracza"""
+        """Zmiana gracza."""
         if self.next_player == c.HUMAN:
             self.next_player = c.COMPUTER
         elif self.next_player == c.COMPUTER:
@@ -244,7 +244,7 @@ class Tie(Gui):
 
 
     def create_players(self):
-        """Stworzenie obiektów graczy"""
+        """Stworzenie obiektów graczy."""
         self.human = Human(self.screen, self, c.HUMAN, c.BLACK)
         self.computer = Computer(self.screen, self, c.COMPUTER, c.WHITE)
 

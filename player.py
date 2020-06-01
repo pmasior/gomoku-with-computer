@@ -11,7 +11,7 @@ from stone import Stone
 
 
 class Player:
-    """Klasa reprezentująca gracza w grze"""
+    """Klasa reprezentująca gracza w grze."""
     def __init__(self, screen, tie, number, color):
         self.screen = screen
         self.tie = tie
@@ -21,19 +21,19 @@ class Player:
 
 
     def check_if_field_is_empty(self, n, m, board): # pylint: disable=invalid-name
-        """Sprawdza, czy pole w tabeli jest puste"""
+        """Sprawdza, czy pole w tabeli jest puste."""
         if board[n][m] is c.EMPTY: # pylint: disable=invalid-name
             return True
         return False
 
 
     def write_move(self, n, m): # pylint: disable=invalid-name
-        """Zapisuje ruch na planszy"""
+        """Zapisuje ruch na planszy."""
         self.tie.board[n][m] = self.number # pylint: disable=invalid-name
 
 
     def draw_move(self, x, y): # pylint: disable=invalid-name
-        """Tworzy nowy kamień i pokazuje go na planszy"""
+        """Tworzy nowy kamień i pokazuje go na planszy."""
         stone = Stone(self.color, x, y)
         self.tie.all_sprites.add(stone)
         self.stone_sprites.add(stone)
@@ -41,9 +41,9 @@ class Player:
 
 
 class Human(Player):
-    """Reprezentuje gracza, który jest człowiekim"""
+    """Reprezentuje gracza, który jest człowiekim."""
     def move(self, mouse_x, mouse_y):
-        """ Sprawdza czy ruch jest dozwolony, jeśli jest to go wykonuje """
+        """Sprawdza czy ruch jest dozwolony, jeśli jest to go wykonuje."""
         for m in range(0, c.FIELDS):  # pylint: disable=invalid-name
             y = c.GRID_Y_BEGIN + m * c.GRID_TILESIZE  # pylint: disable=invalid-name
             for n in range(0, c.FIELDS):  # pylint: disable=invalid-name
@@ -57,7 +57,7 @@ class Human(Player):
 
 
     def check_if_clicked_in_field(self, x, y, mouse_x, mouse_y):  # pylint: disable=invalid-name
-        """Sprawdza czy kliknięto w pole planszy"""
+        """Sprawdza czy kliknięto w pole planszy."""
         if math.hypot(mouse_x - x, mouse_y - y) < c.STONE_RADIUS:
             return True
         return False
@@ -65,7 +65,7 @@ class Human(Player):
 
 
 class Computer(Player):
-    """Reprezentuje komputer jako gracza"""
+    """Reprezentuje komputer jako gracza."""
     def __init__(self, screen, tie, number, color):
         super().__init__(screen, tie, number, color)
         self.next_move_n = None
@@ -75,7 +75,7 @@ class Computer(Player):
 
 
     def move(self, last_move_n, last_move_m):
-        """Wykonuje ruch komputera"""
+        """Wykonuje ruch komputera."""
         board_copy = copy.deepcopy(self.tie.board)
         self.find_move(board_copy, last_move_n, last_move_m)
         x = c.GRID_X_BEGIN + self.next_move_n * c.GRID_TILESIZE  # pylint: disable=invalid-name
@@ -86,7 +86,7 @@ class Computer(Player):
 
 
     def empty_fields_around(self, board_copy, n, m, area=1):  # pylint: disable=invalid-name
-        """ Zwraca zbiór pustych pól wokól zadanych współrzędnych"""
+        """ Zwraca zbiór pustych pól wokól zadanych współrzędnych."""
         near_empty_fields = set()
         left, top, right, bottom = \
             self.improve_range_of_array(n - area, n + area, m - area, m + area)
@@ -98,7 +98,7 @@ class Computer(Player):
 
 
     def get_empty_fields(self, board_copy, area=1, last_move_n=None, last_move_m=None):
-        """ Zwraca listę pustych pól
+        """Zwraca listę pustych pól.
 
         Najpierw tworzy zbiór pustych pól wokół ostatniego ruchu człowieka,
         potem tworzy nowy zbiór pustych pól wokół wszystkich kamieni na planszy,
@@ -126,7 +126,7 @@ class Computer(Player):
 
 
     def improve_range_of_array(self, left, right, top, bottom):
-        """ Zapewnia, że współrzędne nie wychodzą poza zakres tablicy """
+        """Zapewnia, że współrzędne nie wychodzą poza zakres tablicy."""
         while left < 0:
             left += 1
         while top < 0:
@@ -139,7 +139,7 @@ class Computer(Player):
 
 
     def score_in_alfa_beta(self, board_copy, n, m, depth, winning, draw):  # pylint: disable=invalid-name, too-many-arguments
-        """Ocenia aktualny stan gry względem każdego gracza"""
+        """Ocenia aktualny stan gry względem każdego gracza."""
         if depth % 2 == 0:
             earlier_player = c.HUMAN
         elif depth % 2 == 1:
@@ -153,7 +153,7 @@ class Computer(Player):
         return 0  #None
 
     def score_final_situation(self, earlier_player, depth, winning, draw):
-        """Ocenia aktualny stan gry w przypadku wygranej lub remisu"""
+        """Ocenia aktualny stan gry w przypadku wygranej lub remisu."""
         if winning and earlier_player == c.HUMAN:
             return depth - 100
         if winning and earlier_player == c.COMPUTER:
@@ -164,7 +164,7 @@ class Computer(Player):
 
 
     def score_nonfinal_situation(self, board_copy, n, m, earlier_player, depth):  # pylint: disable=invalid-name, too-many-arguments
-        """Ocenia aktualny stan gry w przypadku, gdy gra nie kończy się"""
+        """Ocenia aktualny stan gry w przypadku, gdy gra nie kończy się."""
         horizontally = list()
         vertically = list()
         diagonally1 = list()
@@ -237,11 +237,11 @@ class Computer(Player):
 
 
     def find_move(self, board_copy, last_move_n, last_move_m):
-        """ Wybiera następny ruch komputera
+        """Wybiera następny ruch komputera.
 
         Wykorzystuje pętlę algorytmu minimax dla gracza MAX, żeby wyznaczyć
         następny ruch komputera, który zostaje zapisany jako atrybut klasy
-        Computer
+        Computer.
         """
         alfa = -math.inf
         empty_fields = self.get_empty_fields(board_copy, 1, last_move_n, last_move_m)
@@ -256,7 +256,7 @@ class Computer(Player):
 
 
     def alfa_beta(self, board_copy, alfa, beta, n=None, m=None, depth=0):  # pylint: disable=invalid-name, too-many-arguments
-        """ Algorytm alfa-beta
+        """Wybiera następny ruch komputera przy użyciu algorytmu alfa-beta.
 
         Argumenty:
         board_copy -- tablica z aktualnymi ruchami graczy

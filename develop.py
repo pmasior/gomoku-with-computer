@@ -12,13 +12,13 @@ import constants as c
 # python3 gomoku.py > resgom.txt
 
 def init_debug_file():
-    """Czyści plik używany do zapisywania logów"""
+    """Czyści plik używany do zapisywania logów."""
     file = open("resgom.txt", "w")
     file.write(" ")
     file.close()
 
 def print_board(board, tekst="default"):
-    """Wypisuje stan tablicy board[] do pliku"""
+    """Wypisuje stan tablicy board[] do pliku."""
     if c.LOG_TO_FILE == 0:
         print("\n print_board()", tekst)
         for m in range(0, c.FIELDS): # pylint: disable=invalid-name
@@ -41,10 +41,6 @@ def print_board(board, tekst="default"):
                     file.write(" ")
             file.write("\n")
         file.close()
-
-def draw_move(self, x, y): # pylint: disable=invalid-name
-    """Rysowanie kamienia bez użycia zewnętrznych obrazów"""
-    pygame.draw.circle(self.game.screen, self.color, (x, y), c.STONE_RADIUS)
 
 
 
