@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf_8 -*-
 
 import pygame
 import math
@@ -11,7 +10,7 @@ from develop import *
 from stone import *
 
 
-class Player():
+class Player:
     def __init__(self, screen, tie, number, color):
         self.screen = screen
         self.tie = tie
@@ -21,7 +20,7 @@ class Player():
 
 
     def check_if_field_is_empty(self, n, m, board):
-        if board[n][m] == None:
+        if board[n][m] is EMPTY:
             return True
         return False
 
@@ -44,8 +43,8 @@ class Human(Player):
             y = GRID_Y_BEGIN + m * GRID_TILESIZE
             for n in range(0, FIELDS):
                 x = GRID_X_BEGIN + n * GRID_TILESIZE
-                if self.check_if_clicked_in_field(x, y, mouse_x, mouse_y) and \
-                   self.check_if_field_is_empty(n, m, self.tie.board):
+                if (self.check_if_clicked_in_field(x, y, mouse_x, mouse_y) and 
+                    self.check_if_field_is_empty(n, m, self.tie.board)):
                     self.write_move(n, m)
                     self.draw_move(x, y)
                     return n, m
@@ -82,20 +81,22 @@ class Computer(Player):
         """ Zwraca listę pustych pól
 
         Najpierw tworzy zbiór pustych pól wokół ostatniego ruchu człowieka,
-        potem tworzy nowy zbiór pustych pól wokól wszystkich kamieni na planszy.
-        Dzięki temu dostarcza funkcji alfa_beta() ...
+        potem tworzy nowy zbiór pustych pól wokół wszystkich kamieni na planszy, 
+        ale niezawierający pól z wcześniejszego zbioru.
+        Dzięki temu dostarcza funkcji alfa_beta() w pierwszej kolejności pola,
+        które mogą mieć największe znaczenie dla wygranej w grze.
         """
         empty_fields = list()
         near_empty_fields = set()
         rest_empty_fields = set()
         for i in range(FIELDS):
             for j in range(FIELDS):
-                if board_copy[i][j] != None:
+                if board_copy[i][j] is not EMPTY:
                     near_empty_fields |= self.empty_fields_around(board_copy, i, j, area)
-                # elif board_copy[i][j] == None:
+                # elif board_copy[i][j] is EMPTY:
                 #     rest_empty_fields.add((i, j))
 
-        if last_move_n != None or last_move_m != None:
+        if last_move_n is not None or last_move_m is not None:
             last_move_near_empty_fields = self.empty_fields_around(board_copy, last_move_n, last_move_m)
             empty_fields.extend(list(last_move_near_empty_fields))
             near_empty_fields -= last_move_near_empty_fields
@@ -133,15 +134,15 @@ class Computer(Player):
         return left, top, right, bottom
 
 
-    def score_in_alfa_beta(self, board_copy, n, m, depth, winner, draw):
+    def score_in_alfa_beta(self, board_copy, n, m, depth, winning, draw):
         if depth % 2 == 0:
             earlier_player = HUMAN
         elif depth % 2 == 1:
             earlier_player = COMPUTER
 
-        if earlier_player == HUMAN and winner == True:
+        if winning and earlier_player == HUMAN:
             return depth - 100
-        elif earlier_player == COMPUTER and winner == True:
+        elif winning and earlier_player == COMPUTER:
             return 100 - depth
         # else:
         #     return 0
@@ -167,7 +168,7 @@ class Computer(Player):
                 if len(line) == 6:
                     human = line.count(HUMAN)
                     computer = line.count(COMPUTER)
-                    none_s = line.count(None)
+                    none_s = line.count(EMPTY)
                     if earlier_player == HUMAN:
                         me_s = human
                         opponent_s = computer
@@ -179,13 +180,13 @@ class Computer(Player):
                         me_n = COMPUTER
                         opponent_n = HUMAN
 
-                    if me_s == 4 and line[-2] == line[-1] == None:
+                    if me_s == 4 and line[-2] == line[-1] is EMPTY:
                         score = max(score, 80)
-                    elif me_s == 4 and line[0] == line[-1] == None:
+                    elif me_s == 4 and line[0] == line[-1] is EMPTY:
                         score = max(score, 80)
-                    elif me_s == 4 and line[0] == line[1] == None:
+                    elif me_s == 4 and line[0] == line[1] is EMPTY:
                         score = max(score, 80)
-                    elif me_s == 4 and none_s == 2 and ((line[0] == None) != (line[-1] == None)):
+                    elif me_s == 4 and none_s == 2 and ((line[0] is EMPTY) != (line[-1] is EMPTY)):
                         score = max(score, 70)
                     elif me_s == 4 and none_s == 1 and ((line[0] == opponent_n) != (line[-1] == opponent_n)):
                         score = max(score, 70)
@@ -197,7 +198,7 @@ class Computer(Player):
                     #     score = max(score, 60)
                     # elif line[3:6].count(me_n) == 3 and none_s == 3:
                     #     score = max(score, 60)
-                    # elif me_s == 3 and none_s == 3 and line[0] == line[-1] == None:
+                    # elif me_s == 3 and none_s == 3 and line[0] == line[-1] is EMPTY:
                     #     score = max(score, 50)
                     # elif line[0:3].count(me_n) == 3 and none_s == 2 and line[0] == opponent_n:
                     #     score = max(score, 50)
@@ -232,7 +233,7 @@ class Computer(Player):
             n, m = empty_field
             board_copy[n][m] = COMPUTER
             value = self.alfa_beta(board_copy, alfa, math.inf, n, m, 1)
-            board_copy[n][m] = None
+            board_copy[n][m] = EMPTY
             if value > alfa:
                 alfa = value
                 self.next_move_n, self.next_move_m = n, m
@@ -271,11 +272,11 @@ class Computer(Player):
             player = HUMAN
             earlier_player = COMPUTER
 
-        winner = self.tie.check_winner(n, m, board_copy, earlier_player)
+        winning = self.tie.check_winning(n, m, board_copy, earlier_player)
         draw = self.tie.check_draw(board_copy)
         # print("depth", depth)  # DEBUG:
-        if winner == True or draw == True or depth == MAX_DEPTH:
-            score = self.score_in_alfa_beta(board_copy, n, m, depth, winner, draw)
+        if winning or draw or depth == MAX_DEPTH:
+            score = self.score_in_alfa_beta(board_copy, n, m, depth, winning, draw)
             # print("ab+() d", depth, " v", score, " n", n, " m", m, " p", player, "ep", earlier_player, sep='')  # DEBUG:
             return score
 
@@ -283,19 +284,19 @@ class Computer(Player):
             value = -math.inf
             for empty_field in self.get_empty_fields(board_copy, 1):
                 n, m = empty_field
-                # if self.next_move_beta_n != None and self.next_move_beta_m != None:
+                # if self.next_move_beta_n is not None and self.next_move_beta_m is not None:
                 #     n, m = self.next_move_beta_n, self.next_move_beta_m
                 board_copy[n][m] = player
                 value = self.alfa_beta(board_copy, alfa, beta, n, m, depth + 1)
                 # print("ab ()", " v", value, " n", n, " m", m, " p", player, " d", depth,  sep='')  # DEBUG:
-                board_copy[n][m] = None
+                board_copy[n][m] = EMPTY
                 if value > alfa:
                     alfa = value
                 if alfa >= beta:
                     # print("ifβ", "*" * depth, beta)  # DEBUG:
                     # if value == 97:
                     #     self.next_move_beta_n, self.next_move_beta_m = n, m
-                    # elif self.next_move_beta_n != None and self.next_move_beta_m != None:
+                    # elif self.next_move_beta_n is not None and self.next_move_beta_m is not None:
                     #     self.next_move_beta_n, self.next_move_beta_m = None, None
                     return beta
                     # break
@@ -305,19 +306,19 @@ class Computer(Player):
             value = math.inf
             for empty_field in self.get_empty_fields(board_copy, 1):
                 n, m = empty_field
-                # if self.next_move_beta_n != None and self.next_move_beta_m != None:
+                # if self.next_move_beta_n is not None and self.next_move_beta_m is not None:
                 #     n, m = self.next_move_beta_n, self.next_move_beta_m
                 board_copy[n][m] = player
                 value = self.alfa_beta(board_copy, alfa, beta, n, m, depth + 1)
                 # print("ab ()", " v", value, " n", n, " m", m, " p", player, " d", depth,  sep='')  # DEBUG:
-                board_copy[n][m] = None
+                board_copy[n][m] = EMPTY
                 if value < beta:
                     beta = value
                 if alfa >= beta:
                     # print("ifα", "*" * depth, alfa)  # DEBUG:
                     # if value == -98:
                     #     self.next_move_beta_n, self.next_move_beta_m = n, m
-                    # elif self.next_move_beta_n != None and self.next_move_beta_m != None:
+                    # elif self.next_move_beta_n is not None and self.next_move_beta_m is not None:
                     #     self.next_move_beta_n, self.next_move_beta_m = None, None
                     return alfa
                     # break

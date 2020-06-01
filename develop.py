@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf_8 -*-
 
 from constants import *
 
@@ -19,22 +18,22 @@ def print_board(board, tekst = "default"):
         print("\n print_board()", tekst)
         for m in range(0, FIELDS):
             for n in range(0, FIELDS):
-                if board[n][m] != None:
+                if board[n][m] is not EMPTY:
                     print(board[n][m], end=' ')
                 else:
                     print("░", end=' ')
             print()
     elif LOG_TO_FILE == 1:
         file = open("resgom.txt", "a")
-        file.write("\n print_board()" + tekst + "\n")
+        file.write(f"\n print_board() {tekst}\n")
         for m in range(0, FIELDS):
             for n in range(0, FIELDS):
-                if board[n][m] != None:
+                if board[n][m] is not EMPTY:
                     file.write(str(board[n][m]))
-                    file.write(str(" "))
+                    file.write(" ")
                 else:
                     file.write("░")
-                    file.write(str(" "))
+                    file.write(" ")
             file.write("\n")
         file.close()
 
