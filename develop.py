@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
+"""Funkcje do zapisywania logów"""
 
-from constants import *
+import pygame
+
+from constants import FIELDS, EMPTY, LOG_TO_FILE, STONE_RADIUS
 
 # grep -n 'if' resgom.txt
 # grep '.*Tie' -A 15 "resgom9.txt"
@@ -9,15 +12,17 @@ from constants import *
 # python3 gomoku.py > resgom.txt
 
 def init_debug_file():
+    """Czyści plik używany do zapisywania logów"""
     file = open("resgom.txt", "w")
     file.write(" ")
     file.close()
 
-def print_board(board, tekst = "default"):
+def print_board(board, tekst="default"):
+    """Wypisuje stan tablicy board[] do pliku"""
     if LOG_TO_FILE == 0:
         print("\n print_board()", tekst)
-        for m in range(0, FIELDS):
-            for n in range(0, FIELDS):
+        for m in range(0, FIELDS): # pylint: disable=invalid-name
+            for n in range(0, FIELDS): # pylint: disable=invalid-name
                 if board[n][m] is not EMPTY:
                     print(board[n][m], end=' ')
                 else:
@@ -26,8 +31,8 @@ def print_board(board, tekst = "default"):
     elif LOG_TO_FILE == 1:
         file = open("resgom.txt", "a")
         file.write(f"\n print_board() {tekst}\n")
-        for m in range(0, FIELDS):
-            for n in range(0, FIELDS):
+        for m in range(0, FIELDS): # pylint: disable=invalid-name
+            for n in range(0, FIELDS): # pylint: disable=invalid-name
                 if board[n][m] is not EMPTY:
                     file.write(str(board[n][m]))
                     file.write(" ")
@@ -37,7 +42,8 @@ def print_board(board, tekst = "default"):
             file.write("\n")
         file.close()
 
-def draw_move(self, x, y):
+def draw_move(self, x, y): # pylint: disable=invalid-name
+    """Rysowanie kamienia bez użycia zewnętrznych obrazów"""
     pygame.draw.circle(self.game.screen, self.color, (x, y), STONE_RADIUS)
 
 
