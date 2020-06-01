@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf_8 -*-
 
 import pygame
 
 from constants import *
 
 
-class Gui():
+class Gui:
     def __init__(self):
         pygame.init()
         pygame.mixer.quit()  # avoid error when pygame CPU usage is 100%
@@ -42,7 +41,7 @@ class Gui():
         if self.next_player == HUMAN:
             rect2 = self.draw_text(self.screen, 50, 25, "Human", 28, DARK_GRAY)
         elif self.next_player == COMPUTER:
-            rect2 = self.draw_text(self.screen, 50, 25, "computer", 28, WHITE)
+            rect2 = self.draw_text(self.screen, 50, 25, "Computer", 28, WHITE)
         pygame.display.update(rect2)
 
 
@@ -52,11 +51,11 @@ class Gui():
         if self.winner == HUMAN:
             rect2 = self.draw_text(self.screen, 50, 15, "Won Human", 36, SAND)
         elif self.winner == COMPUTER:
-            rect2 = self.draw_text(self.screen, 50, 15, "Won computer", 36, SAND)
+            rect2 = self.draw_text(self.screen, 50, 15, "Won Computer", 36, SAND)
         elif self.winner == PLAYER_DRAW:
             rect2 = self.draw_text(self.screen, 50, 15, "Draw", 36, SAND)
         # else:  # DEBUG:
-            # rect2 = self.draw_text(self.screen, 50, 15, "Testy", 36, SAND)  # DEBUG: 
+            # rect2 = self.draw_text(self.screen, 50, 15, "Testy", 36, SAND)  # DEBUG:
         pygame.display.update(rect2)
 
 
@@ -70,7 +69,7 @@ class Gui():
 
 
     def draw_welcome_screen(self):
-        rules = "The winner is first player whose form unbroken line"
+        rules = "The winner is the first player whose form an unbroken line"
         rules2 = "of exactly 5 stones horizontally, vertically or diagonally"
         action = "Click anywhere to start"
         self.draw_screen(action, rules, rules2)
@@ -79,15 +78,14 @@ class Gui():
     def draw_gameover_screen(self):
         rules = None
         if self.winner == HUMAN:
-            rules = "Won Human"
+            rules = "Human won"
         elif self.winner == COMPUTER:
-            rules = "Won computer"
+            rules = "Computer won"
         elif self.winner == PLAYER_DRAW:
             rules = "Draw. There is no winner"
         else:
             rules = "You are still playing"
-        rules2 = "Human    " + str(self.player1_wins)\
-        + " : " + str(self.player2_wins) + "    computer"
+        rules2 = f'Human    {str(self.human_wins)} : {str(self.computer_wins)}    Computer'
         action = "Click anywhere to start next game"
         self.draw_screen(action, rules, rules2)
 

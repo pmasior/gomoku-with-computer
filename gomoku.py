@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf_8 -*-
 
 import sys
 import random
@@ -22,8 +21,8 @@ class Gomoku(Gui):
     def __init__(self):
         super().__init__()
         self.clock = pygame.time.Clock()
-        self.player1_wins = 0
-        self.player2_wins = 0
+        self.human_wins = 0
+        self.computer_wins = 0
         self.player_draw = 0
         self.last_winner = 0
         self.draw_welcome_screen()
@@ -33,7 +32,7 @@ class Gomoku(Gui):
     def run(self):
         self.running = True
         while self.running:
-            self.clock.tick(FPS)
+            self.clock.tick(FRAMES_PER_SECOND)
             self.events()
             self.update()
             self.draw()
@@ -75,9 +74,9 @@ class Gomoku(Gui):
     def save_last_game_status(self):
         self.winner = self.tie.winner
         if self.winner == HUMAN:
-            self.player1_wins += 1
+            self.human_wins += 1
         elif self.winner == COMPUTER:
-            self.player2_wins += 1
+            self.computer_wins += 1
         elif self.winner == PLAYER_DRAW:
             self.player_draw += 1
 

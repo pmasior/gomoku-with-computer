@@ -3,7 +3,7 @@ from os import path
 TITLE = "Gomoku"
 WIDTH = 800
 HEIGHT = 850
-FPS = 30
+FRAMES_PER_SECOND = 30
 
 LOG_STATE_OF_BOARD = 0  # 0 - brak logów; 1 - logi z tie(); 2 - logi z alfa_beta()
     # !!! włączenie logów bardzo spowalnia działanie programu
@@ -18,6 +18,7 @@ LIGHT_SAND = (226, 192, 141)
 SAND = (177, 153, 115)
 DARK_SAND = (115, 104, 85)
 
+EMPTY = None
 HUMAN = 1
 COMPUTER = 2
 PLAYER_DRAW = 3
