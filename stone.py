@@ -5,7 +5,7 @@ __all__ = ["Stone"]
 
 import pygame
 
-from constants import WHITE, BLACK, IMG_WHITE_STONE, IMG_BLACK_STONE
+import constants as c
 
 class Stone(pygame.sprite.Sprite):  # pylint: disable=too-few-public-methods
     """Graficzna reprezentacja kamienia na planszy"""
@@ -18,10 +18,10 @@ class Stone(pygame.sprite.Sprite):  # pylint: disable=too-few-public-methods
 
     def set_image(self):
         """Narysowanie kamienia na planszy"""
-        if self.color == WHITE:
-            self.image = pygame.image.load(IMG_WHITE_STONE)
-        elif self.color == BLACK:
-            self.image = pygame.image.load(IMG_BLACK_STONE)
+        if self.color == c.WHITE:
+            self.image = pygame.image.load(c.IMG_WHITE_STONE)
+        elif self.color == c.BLACK:
+            self.image = pygame.image.load(c.IMG_BLACK_STONE)
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
 

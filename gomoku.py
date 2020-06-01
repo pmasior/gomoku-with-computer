@@ -11,14 +11,15 @@ except ModuleNotFoundError:
     print("python3 -m pip install pygame")
     sys.exit()
 
-from tie import Tie  # pylint: disable=wrong-import-position
-from constants import FRAMES_PER_SECOND, HUMAN, COMPUTER, PLAYER_DRAW  # pylint: disable=wrong-import-position
+import constants as c  # pylint: disable=wrong-import-position
 from gui import Gui  # pylint: disable=wrong-import-position
+from tie import Tie  # pylint: disable=wrong-import-position
 
 # Ignore false positive pygame errors
 # pylint: disable=E1101
 
 class Gomoku(Gui):
+    """Główna klasa uruchamiająca aplikację"""
     def __init__(self):
         super().__init__()
         self.clock = pygame.time.Clock()
@@ -37,7 +38,7 @@ class Gomoku(Gui):
         """Główna pętla programu"""
         self.running = True
         while self.running:
-            self.clock.tick(FRAMES_PER_SECOND)
+            self.clock.tick(c.FRAMES_PER_SECOND)
             self.events()
             self.update()
             self.draw()
@@ -58,7 +59,6 @@ class Gomoku(Gui):
 
     def update(self):
         """Aktualizacja obiektów podczas każdej pętli w run()"""
-        pass
 
 
     def draw(self):
@@ -82,11 +82,11 @@ class Gomoku(Gui):
     def save_last_game_status(self):
         """Zapisuje, któ©y gracz wygrał podczas ostatniej tury"""
         self.winner = self.tie.winner
-        if self.winner == HUMAN:
+        if self.winner == c.HUMAN:
             self.human_wins += 1
-        elif self.winner == COMPUTER:
+        elif self.winner == c.COMPUTER:
             self.computer_wins += 1
-        elif self.winner == PLAYER_DRAW:
+        elif self.winner == c.PLAYER_DRAW:
             self.player_draw += 1
 
 

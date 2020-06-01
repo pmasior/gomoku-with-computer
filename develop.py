@@ -3,7 +3,7 @@
 
 import pygame
 
-from constants import FIELDS, EMPTY, LOG_TO_FILE, STONE_RADIUS
+import constants as c
 
 # grep -n 'if' resgom.txt
 # grep '.*Tie' -A 15 "resgom9.txt"
@@ -19,21 +19,21 @@ def init_debug_file():
 
 def print_board(board, tekst="default"):
     """Wypisuje stan tablicy board[] do pliku"""
-    if LOG_TO_FILE == 0:
+    if c.LOG_TO_FILE == 0:
         print("\n print_board()", tekst)
-        for m in range(0, FIELDS): # pylint: disable=invalid-name
-            for n in range(0, FIELDS): # pylint: disable=invalid-name
-                if board[n][m] is not EMPTY:
+        for m in range(0, c.FIELDS): # pylint: disable=invalid-name
+            for n in range(0, c.FIELDS): # pylint: disable=invalid-name
+                if board[n][m] is not c.EMPTY:
                     print(board[n][m], end=' ')
                 else:
                     print("░", end=' ')
             print()
-    elif LOG_TO_FILE == 1:
+    elif c.LOG_TO_FILE == 1:
         file = open("resgom.txt", "a")
         file.write(f"\n print_board() {tekst}\n")
-        for m in range(0, FIELDS): # pylint: disable=invalid-name
-            for n in range(0, FIELDS): # pylint: disable=invalid-name
-                if board[n][m] is not EMPTY:
+        for m in range(0, c.FIELDS): # pylint: disable=invalid-name
+            for n in range(0, c.FIELDS): # pylint: disable=invalid-name
+                if board[n][m] is not c.EMPTY:
                     file.write(str(board[n][m]))
                     file.write(" ")
                 else:
@@ -44,7 +44,7 @@ def print_board(board, tekst="default"):
 
 def draw_move(self, x, y): # pylint: disable=invalid-name
     """Rysowanie kamienia bez użycia zewnętrznych obrazów"""
-    pygame.draw.circle(self.game.screen, self.color, (x, y), STONE_RADIUS)
+    pygame.draw.circle(self.game.screen, self.color, (x, y), c.STONE_RADIUS)
 
 
 

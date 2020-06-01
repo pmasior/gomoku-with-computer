@@ -3,10 +3,10 @@
 
 import pygame
 
-from constants import FRAMES_PER_SECOND, EMPTY, FIELDS, DARK_SAND, LOG_TO_FILE, HUMAN, COMPUTER, LOG_STATE_OF_BOARD, PLAYER_DRAW, BLACK, WHITE
-from player import Human, Computer
+import constants as c
 from develop import init_debug_file, print_board
 from gui import Gui
+from player import Human, Computer
 
 # Ignore false positive pygame errors
 # pylint: disable=E1101
@@ -17,19 +17,19 @@ class Tie(Gui):
         self.screen = screen
         self.clock = clock
         self.next_player = 1
-        self.board = [[EMPTY for n in range(FIELDS)] for m in range(FIELDS)]
+        self.board = [[c.EMPTY for n in range(c.FIELDS)] for m in range(c.FIELDS)]
         self.all_sprites = pygame.sprite.Group()
         self.winner = None
         self.last_move_n = None
         self.last_move_m = None
         self.playing = True
         self.create_players()
-        self.draw_background(DARK_SAND)
+        self.draw_background(c.DARK_SAND)
         self.draw_grid()
         self.draw()
         self.show_actual_player()
         self.run()
-        if LOG_TO_FILE == 1:
+        if c.LOG_TO_FILE == 1:
             init_debug_file()
 
 
@@ -37,7 +37,7 @@ class Tie(Gui):
         """Główna pętla programu podczas trwania rozgrywki"""
         self.playing = True
         while self.playing:
-            self.clock.tick(FRAMES_PER_SECOND)
+            self.clock.tick(c.FRAMES_PER_SECOND)
             self.events()
             self.update()
             self.draw()
@@ -51,9 +51,9 @@ class Tie(Gui):
             if event.type == pygame.MOUSEBUTTONUP:
                 if self.winner is not None:
                     self.playing = False
-                if self.next_player == HUMAN:
+                if self.next_player == c.HUMAN:
                     self.move_human()
-                if self.next_player == COMPUTER:
+                if self.next_player == c.COMPUTER:
                     self.move_computer()
 
 
@@ -73,7 +73,7 @@ class Tie(Gui):
         (mouse_x, mouse_y) = pygame.mouse.get_pos()
         n, m = self.human.move(mouse_x, mouse_y)  # pylint: disable=invalid-name
         if n is not None and m is not None:
-            if LOG_STATE_OF_BOARD > 0:
+            if c.LOG_STATE_OF_BOARD > 0:
                 print_board(self.board, "Tie")
             self.end_if_gameover(n, m, self.board)
             if self.winner is None:
@@ -87,7 +87,7 @@ class Tie(Gui):
     def move_computer(self):
         """Wywołanie ruchu wykonywanego przez komputer"""
         n, m = self.computer.move(self.last_move_n, self.last_move_m)  # pylint: disable=invalid-name
-        if LOG_STATE_OF_BOARD > 0:
+        if c.LOG_STATE_OF_BOARD > 0:
             print_board(self.board, "Tie")
         self.end_if_gameover(n, m, self.board)
         if self.winner is None:
@@ -146,10 +146,10 @@ class Tie(Gui):
         if left - 1 >= 0:
             if board[left - 1][m] == player:
                 return False
-        if right + 1 < FIELDS:
+        if right + 1 < c.FIELDS:
             if board[right + 1][m] == player:
                 return False
-        if left >= 0 and right < FIELDS:
+        if left >= 0 and right < c.FIELDS:
             if (board[left][m] ==
                     board[left+1][m] ==
                     board[left+2][m] ==
@@ -167,10 +167,10 @@ class Tie(Gui):
         if top - 1 >= 0:
             if board[n][top - 1] == player:
                 return False
-        if down + 1 < FIELDS:
+        if down + 1 < c.FIELDS:
             if board[n][down + 1] == player:
                 return False
-        if top >= 0 and down < FIELDS:
+        if top >= 0 and down < c.FIELDS:
             if (board[n][top] ==
                     board[n][top + 1] ==
                     board[n][top + 2] ==
@@ -190,10 +190,10 @@ class Tie(Gui):
         if left - 1 >= 0 and top - 1 >= 0:
             if board[left - 1][top - 1] == player:
                 return False
-        if right + 1 < FIELDS and down + 1 < FIELDS:
+        if right + 1 < c.FIELDS and down + 1 < c.FIELDS:
             if board[right + 1][down + 1] == player:
                 return False
-        if left >= 0 and right < FIELDS and top >= 0 and down < FIELDS:
+        if left >= 0 and right < c.FIELDS and top >= 0 and down < c.FIELDS:
             if (board[left][top] ==
                     board[left + 1][top + 1] ==
                     board[left + 2][top + 2] ==
@@ -210,13 +210,13 @@ class Tie(Gui):
         right = n + 2 + (-out_extent)
         top = m - 2 + out_extent
         down = m + 2 + out_extent
-        if right + 1 < FIELDS and top - 1 >= 0:
+        if right + 1 < c.FIELDS and top - 1 >= 0:
             if board[right + 1][top - 1] == player:
                 return False
-        if left - 1 >= 0 and down + 1 < FIELDS:
+        if left - 1 >= 0 and down + 1 < c.FIELDS:
             if board[left - 1][down + 1] == player:
                 return False
-        if left >= 0 and right < FIELDS and top >= 0 and down < FIELDS:
+        if left >= 0 and right < c.FIELDS and top >= 0 and down < c.FIELDS:
             if (board[right][top] ==
                     board[left + 3][top + 1] ==
                     board[left + 2][top + 2] ==
@@ -229,24 +229,24 @@ class Tie(Gui):
 
     def check_draw(self, board):
         """Sprawdzanie czy wystąpił remis"""
-        if sum([j.count(HUMAN) + j.count(COMPUTER) for j in board]) > (FIELDS-1)**2:
-            self.winner = PLAYER_DRAW
+        if sum([j.count(c.HUMAN) + j.count(c.COMPUTER) for j in board]) > (c.FIELDS-1)**2:
+            self.winner = c.PLAYER_DRAW
             return True
         return False
 
 
     def change_player(self):
         """Zmiana gracza"""
-        if self.next_player == HUMAN:
-            self.next_player = COMPUTER
-        elif self.next_player == COMPUTER:
-            self.next_player = HUMAN
+        if self.next_player == c.HUMAN:
+            self.next_player = c.COMPUTER
+        elif self.next_player == c.COMPUTER:
+            self.next_player = c.HUMAN
 
 
     def create_players(self):
         """Stworzenie obiektów graczy"""
-        self.human = Human(self.screen, self, HUMAN, BLACK)
-        self.computer = Computer(self.screen, self, COMPUTER, WHITE)
+        self.human = Human(self.screen, self, c.HUMAN, c.BLACK)
+        self.computer = Computer(self.screen, self, c.COMPUTER, c.WHITE)
 
 
 
