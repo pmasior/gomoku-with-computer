@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Gracz w grze Gomoku"""
 
-import math
 import copy
+import math
+
 import pygame
 
 import constants as c

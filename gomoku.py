@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Główny moduł"""
 
-import sys
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # ukrycie powitania pygame
+import sys
+
 try:
     import pygame
 except ModuleNotFoundError:

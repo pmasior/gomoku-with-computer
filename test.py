@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 "Testy modułu tie"
 
-import unittest
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # ukrycie powitania pygame
+import unittest
 
 # pylint: disable=wrong-import-position
 import numpy as np
