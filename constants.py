@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+"""Stałe w grze Gomoku"""
+
 from os import path
 
 TITLE = "Gomoku"
