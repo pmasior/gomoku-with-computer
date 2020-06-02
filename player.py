@@ -21,16 +21,16 @@ class Player:
         self.stone_sprites = pygame.sprite.Group()
 
 
-    def check_if_field_is_empty(self, i, j, board):
+    def check_if_field_is_empty(self, move_i, move_j, board):
         """Sprawdza, czy pole w tabeli jest puste."""
-        if board[i][j] is None:
+        if board[move_i][move_j] is None:
             return True
         return False
 
 
-    def write_move(self, i, j):
+    def write_move(self, move_i, move_j):
         """Zapisuje ruch na planszy."""
-        self.actual_tie.board[i][j] = self.number
+        self.actual_tie.board[move_i][move_j] = self.number
 
 
     def draw_move(self, x_position, y_position):
@@ -70,30 +70,30 @@ class Computer(Player):
     """Reprezentuje komputer jako gracza."""
     def __init__(self, screen, tie, number, color):
         super().__init__(screen, tie, number, color)
-        self.next_move_n = None
-        self.next_move_m = None
-        self.next_move_beta_n = None
-        self.next_move_beta_m = None
+        self.next_move_i = None
+        self.next_move_j = None
+        self.next_move_beta_i = None
+        self.next_move_beta_j = None
         self.board_copy = copy.deepcopy(self.actual_tie.board)
 
 
-    def move(self, last_move_n, last_move_m):
+    def move(self, last_move_i, last_move_j):
         """Wykonuje ruch komputera."""
         self.board_copy = copy.deepcopy(self.actual_tie.board)
-        self.find_move(last_move_n, last_move_m)
-        x_position = c.GRID_X_BEGIN + self.next_move_n * c.GRID_TILESIZE
-        y_position = c.GRID_Y_BEGIN + self.next_move_m * c.GRID_TILESIZE
-        self.write_move(self.next_move_n, self.next_move_m)
+        self.find_move(last_move_i, last_move_j)
+        x_position = c.GRID_X_BEGIN + self.next_move_i * c.GRID_TILESIZE
+        y_position = c.GRID_Y_BEGIN + self.next_move_j * c.GRID_TILESIZE
+        self.write_move(self.next_move_i, self.next_move_j)
         self.draw_move(x_position, y_position)
-        return self.next_move_n, self.next_move_m
+        return self.next_move_i, self.next_move_j
 
 
-    def empty_fields_around(self, move_n, move_m, area=1):
+    def empty_fields_around(self, move_i, move_j, area=1):
         """ Zwraca zbiór pustych pól wokól zadanych współrzędnych."""
         near_empty_fields = set()
         left, top, right, bottom = \
-            self.improve_range_of_array(move_n - area, move_n + area,
-                                        move_m - area, move_m + area)
+            self.improve_range_of_array(move_i - area, move_i + area,
+                                        move_j - area, move_j + area)
         for i in range(left, right + 1):
             for j in range(top, bottom + 1):
                 if self.check_if_field_is_empty(i, j, self.board_copy):
@@ -101,7 +101,7 @@ class Computer(Player):
         return near_empty_fields
 
 
-    def get_empty_fields(self, area=1, move_n=None, move_m=None):
+    def get_empty_fields(self, area=1, move_i=None, move_j=None):
         """Zwraca listę pustych pól.
 
         Najpierw tworzy zbiór pustych pól wokół ostatniego ruchu człowieka,
@@ -118,9 +118,8 @@ class Computer(Player):
                 if self.board_copy[i][j] is not None:
                     near_empty_fields |= self.empty_fields_around(i, j, area)
 
-        if move_n is not None or move_m is not None:
-            near_move_empty_fields = self.empty_fields_around(move_n,
-                                                              move_m)
+        if move_i is not None or move_j is not None:
+            near_move_empty_fields = self.empty_fields_around(move_i, move_j)
             empty_fields.extend(list(near_move_empty_fields))
             near_empty_fields -= near_move_empty_fields
 
@@ -142,7 +141,7 @@ class Computer(Player):
         return left, top, right, bottom
 
 
-    def score_in_alfa_beta(self, move_n, move_m, depth, winning, draw):  # pylint: disable=too-many-arguments
+    def score_in_alfa_beta(self, move_i, move_j, depth, winning, draw):  # pylint: disable=too-many-arguments
         """Ocenia aktualny stan gry względem każdego gracza."""
         if depth % 2 == 0:
             earlier_player = c.HUMAN
@@ -150,7 +149,7 @@ class Computer(Player):
             earlier_player = c.COMPUTER
         final_score = self.score_final_situation(earlier_player, depth,
                                                  winning, draw)
-        nonfinal_score = self.score_nonfinal_situation(move_n, move_m,
+        nonfinal_score = self.score_nonfinal_situation(move_i, move_j,
                                                        earlier_player, depth)
         if final_score is not None:
             return final_score
@@ -169,28 +168,28 @@ class Computer(Player):
         return None
 
 
-    def score_nonfinal_situation(self, move_n, move_m, earlier_player, depth):
+    def score_nonfinal_situation(self, move_i, move_j, earlier_player, depth):
         """Ocenia aktualny stan gry w przypadku, gdy gra nie kończy się."""
         horizontally = list()
         vertically = list()
         diagonally1 = list()
         diagonally2 = list()
-        for i in range(-5, 5 + 1):
-            if move_n + i >= 0 and move_n + i < c.FIELDS:
-                horizontally.append(self.board_copy[move_n + i][move_m])
-            if move_m + i >= 0 and move_m + i < c.FIELDS:
-                vertically.append(self.board_copy[move_n][move_m + i])
-            if (move_n + i >= 0 and move_n + i < c.FIELDS and
-                    move_m + i >= 0 and move_m + i < c.FIELDS):
-                diagonally1.append(self.board_copy[move_n + i][move_m + i])
-            if (move_n - i >= 0 and move_n - i < c.FIELDS and
-                    move_m + i >= 0 and move_m + i < c.FIELDS):
-                diagonally2.append(self.board_copy[move_n - i][move_m + i])
+        for i in range(*c.RANGE_OF_LINES_NEARBY_STONE):
+            if move_i + i >= 0 and move_i + i < c.FIELDS:
+                horizontally.append(self.board_copy[move_i + i][move_j])
+            if move_j + i >= 0 and move_j + i < c.FIELDS:
+                vertically.append(self.board_copy[move_i][move_j + i])
+            if (move_i + i >= 0 and move_i + i < c.FIELDS and
+                    move_j + i >= 0 and move_j + i < c.FIELDS):
+                diagonally1.append(self.board_copy[move_i + i][move_j + i])
+            if (move_i - i >= 0 and move_i - i < c.FIELDS and
+                    move_j + i >= 0 and move_j + i < c.FIELDS):
+                diagonally2.append(self.board_copy[move_i - i][move_j + i])
 
         score = 0
         for tab in horizontally, vertically, diagonally1, diagonally2:
-            for i in range(0, 5 + 1):
-                line = tab[i:i+6]
+            for i in range(0, c.LINE_LENGTH_TO_CHECK):
+                line = tab[i:i+c.LINE_LENGTH_TO_CHECK]
                 temp_score = self.score_nonfinal_situation_in_line(line,
                                                                    earlier_player)
                 score = max(temp_score, score)
@@ -240,7 +239,7 @@ class Computer(Player):
         return 0
 
 
-    def find_move(self, last_move_n, last_move_m):
+    def find_move(self, last_move_i, last_move_j):
         """Wybiera następny ruch komputera.
 
         Wykorzystuje pętlę algorytmu minimax dla gracza MAX, żeby wyznaczyć
@@ -248,18 +247,17 @@ class Computer(Player):
         Computer.
         """
         alfa = -math.inf
-        empty_fields = self.get_empty_fields(1, last_move_n, last_move_m)
-        for empty_field in empty_fields:
-            i, j = empty_field
+        empty_fields = self.get_empty_fields(1, last_move_i, last_move_j)
+        for i, j in empty_fields:
             self.board_copy[i][j] = c.COMPUTER
             value = self.alfa_beta(alfa, math.inf, i, j, 1)
             self.board_copy[i][j] = None
             if value > alfa:
                 alfa = value
-                self.next_move_n, self.next_move_m = i, j
+                self.next_move_i, self.next_move_j = i, j
 
 
-    def alfa_beta(self, alfa, beta, i=None, j=None, depth=0):  # pylint: disable=too-many-arguments
+    def alfa_beta(self, alfa, beta, move_i=None, move_j=None, depth=0):  # pylint: disable=too-many-arguments
         """Wybiera następny ruch komputera przy użyciu algorytmu alfa-beta.
 
         Argumenty:
@@ -287,16 +285,16 @@ class Computer(Player):
             player = c.HUMAN
             earlier_player = c.COMPUTER
 
-        winning = self.actual_tie.check_winning(i, j, self.board_copy, earlier_player)
+        winning = self.actual_tie.check_winning(move_i, move_j, self.board_copy,
+                                                earlier_player)
         draw = self.actual_tie.check_draw(self.board_copy)
         if winning or draw or depth == c.MAX_DEPTH:
-            score = self.score_in_alfa_beta(i, j, depth, winning, draw)
+            score = self.score_in_alfa_beta(move_i, move_j, depth, winning, draw)
             return score
 
         if player == c.COMPUTER:
             value = -math.inf
-            for empty_field in self.get_empty_fields(1, i, j):
-                i, j = empty_field
+            for i, j in self.get_empty_fields(1, move_i, move_j):
                 self.board_copy[i][j] = player
                 value = self.alfa_beta(alfa, beta, i, j, depth + 1)
                 self.board_copy[i][j] = None
@@ -307,8 +305,7 @@ class Computer(Player):
             return alfa
         if player == c.HUMAN:
             value = math.inf
-            for empty_field in self.get_empty_fields(1):
-                i, j = empty_field
+            for i, j in self.get_empty_fields(1, move_i, move_j):
                 self.board_copy[i][j] = player
                 value = self.alfa_beta(alfa, beta, i, j, depth + 1)
                 self.board_copy[i][j] = None

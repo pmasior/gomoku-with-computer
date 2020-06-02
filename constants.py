@@ -37,6 +37,9 @@ GRID_Y_BEGIN = GRID_MARGIN + TOP_MARGIN
 GRID_Y_END = GRID_MARGIN + GRID_SIZE + TOP_MARGIN + 1
 GRID_TILESIZE = GRID_SIZE // (FIELDS - 1)
 
+RANGE_OF_LINES_NEARBY_STONE = (-5, 6)
+LINE_LENGTH_TO_CHECK = 6
+
 LOCATION_IMG = path.join(path.dirname(__file__), 'img')
 IMG_COMPUTER_STONE = path.join(LOCATION_IMG, 'pieceWhite_border11.png')
 IMG_HUMAN_STONE = path.join(LOCATION_IMG, 'pieceBlack_border11.png')
