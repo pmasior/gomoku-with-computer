@@ -2,7 +2,7 @@
 [Link do projektu na GitHub](https://github.com/pmasior/gomoku)
 
 ## Opis zadania:
-* gra podobna do gry kółko i krzyżyk, w której celem jest ułożenie dokładnie pięciu kamieni swojego koloru w ciągłej linii na siatce o wielkości 15x15
+* gra podobna do gry kółko i krzyżyk, w której celem jest ułożenie dokładnie pięciu kamieni swojego koloru w ciągłej linii na siatce o wielkości 15x15, ułożenie linii dłuższej niż pięć kamieni nie skutkuje wygraną
 * po uruchomieniu wyświetlany jest krótki opis gry, po kliknięciu w dowolne miejsce rozpoczyna się runda
 * okno w trakcie gry wyświetla aktualnego gracza, który wykonuje ruch w lewym górnym rogu oraz siatkę 15x15
 * pierwszy ruch wykonuje człowiek (czarne kamienie), klikając w jedno z miejsc, w których przecina się linia pozioma z linią pionową +
@@ -13,12 +13,22 @@
 * w trakcie rozgrywki kliknięcie przycisku X spowoduje wyświetlenie informacji, ile tur zostało wygranych przez człowieka, a ile przez komputer, a kliknięcie w dowolne miejsce spowoduje rozpoczęcie nowej tury
 
 ## Testy:
-1. wykonanie dwóch przykładowych ruchów przez każdego z graczy
-2. sprawdzenie czy ruch zostanie wykonany, gdy kliknięcie nastąpi poza obszarem planszy - oczekiwany brak ruchu i brak zmiany gracza, który wykonuje ruch
-3. sprawdzenie czy poprawnie jest wykrywany remis, czyli gdy wszystkie pola na planszy są zajęte
-4. sprawdzenie czy po wygranej gracza poprawnie jest ustawiany licznik wygranych
-5. sprawdzenie czy wygrana, gdy będzie umieszczone więcej niż 5 kamieni w linii - oczekiwana kontynuacja gry
-6. sprawdzenie czy wygrana, gdy gracz ułoży dokładnie 5 kamieni w poziomie - oczekiwana wygrana
-7. sprawdzenie czy wygrana, gdy gracz ułoży dokładnie 5 kamieni w pionie - oczekiwana wygrana
-8. sprawdzenie czy wygrana, gdy gracz ułoży dokładnie 5 kamieni po jednej przekątnej \  - oczekiwana wygrana
-9. sprawdzenie czy wygrana, gdy gracz ułoży dokładnie 5 kamieni po drugiej przekątnej /  - oczekiwana wygrana
+1. ułożenie dokładnie 5 kamieni po jednej przekątnej \  - oczekiwana wygrana
+    * sprawdzenie czy wygrana w `check_winning_diagonally1(`) - oczekiwanie zwrócenia `True`
+    * sprawdzenie czy wygrana w `check_winning()` - oczekiwanie zwrócenia `True`
+2. ułożenie dokładnie 5 kamieni po drugiej przekątnej /  - oczekiwana wygrana
+    * sprawdzenie czy wygrana w `check_winning_diagonally2()` - oczekiwanie zwrócenia `True`
+    * sprawdzenie czy wygrana w `check_winning(`) - oczekiwanie zwrócenia `True`
+3. ułożenie dokładnie 6 kamieni w poziomie - oczekiwanie braku wygranej 
+    * sprawdzenie czy brak wygranej w `check_winning_horizontally()` - oczekiwanie zwrócenia `False`
+    * sprawdzenie czy brak wygranej w `check_winning()` - oczekiwanie zwrócenia `None`
+    * sprawdzenie czy gra nie została zakończona w `test_if_gameover()` - oczekiwanie, że `self.winner is None`
+4. ułożenie dokładnie 6 kamieni w pionie - oczekiwanie braku wygranej 
+    * sprawdzenie czy brak wygranej w `check_winning_horizontally()` - oczekiwanie zwrócenia `False`
+    * sprawdzenie czy brak wygranej w `check_winning()` - oczekiwanie zwrócenia `None`
+    * sprawdzenie czy gra nie została zakończona w `test_if_gameover()` - oczekiwanie, że `self.winner is None`
+5. zapełnienie planszy tak, że żaden gracz nie wygrał - spodziewany remis
+    * sprawdzenie czy brak wygranej w `check_winning()` - oczekiwanie zwrócenia `None`
+    * sprawdzenie czy remis w `check_draw()` - oczekiwanie zwrócenia `True`
+6. zamiana gracza 
+    * sprawdzenie czy gracz został poprawnie zmieniony z `COMPUTER` na `HUMAN` w `change_player()` - oczekiwanie, że `self.next_player is c.HUMAN`

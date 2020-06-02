@@ -73,6 +73,7 @@ class Gomoku(Gui):
         """Rozpoczyna nową turę."""
         self.winner = None
         self.tie = Tie(self.screen, self.clock)
+        self.tie.start()
         self.game_over()
 
 
