@@ -11,24 +11,25 @@ except ModuleNotFoundError:
     print("python3 -m pip install pygame")
     sys.exit()
 
-import constants as c  # pylint: disable=wrong-import-position
-from gui import Gui  # pylint: disable=wrong-import-position
-from tie import Tie  # pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
+import constants as c
+import gui
+import tie
 
 # Ignore false positive pygame errors
 # pylint: disable=E1101
 
-class Gomoku(Gui):
+class Gomoku(gui.Gui):
     """Główna klasa uruchamiająca aplikację."""
-    def __init__(self):
-        super().__init__()
+    def __init__(self, screen):
+        super().__init__(screen)
         self.clock = pygame.time.Clock()
         self.human_wins = 0
         self.computer_wins = 0
         self.player_draw = 0
         self.running = True
         self.winner = None
-        self.tie = None
+        self.actual_tie = None
 
 
     def start(self):
@@ -72,8 +73,8 @@ class Gomoku(Gui):
     def new_game(self):
         """Rozpoczyna nową turę."""
         self.winner = None
-        self.tie = Tie(self.screen, self.clock)
-        self.tie.start()
+        self.actual_tie = tie.Tie(self.screen, self.clock)
+        self.actual_tie.start()
         self.game_over()
 
 
@@ -84,8 +85,8 @@ class Gomoku(Gui):
 
 
     def save_last_game_status(self):
-        """Zapisuje, któ©y gracz wygrał podczas ostatniej tury."""
-        self.winner = self.tie.winner
+        """Zapisuje, który gracz wygrał podczas ostatniej tury."""
+        self.winner = self.actual_tie.winner
         if self.winner == c.HUMAN:
             self.human_wins += 1
         elif self.winner == c.COMPUTER:
@@ -96,7 +97,14 @@ class Gomoku(Gui):
 
 
 def main():
-    game = Gomoku()
+    """Funkcja inicjująca biblioteki zewnętrzne i tworząca obiekt klasy Gui."""
+    pygame.init()
+    pygame.mixer.quit()  # avoid error when pygame CPU usage is 100%
+    pygame.display.set_caption(c.TITLE)
+    screen = pygame.display.set_mode((c.WIDTH, c.HEIGHT), pygame.RESIZABLE)
+
+    game = Gomoku(screen)
+
     game.start()
 
 
