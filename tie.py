@@ -23,6 +23,10 @@ class Tie(Gui):
         self.last_move_n = None
         self.last_move_m = None
         self.playing = True
+
+    
+    def start(self):
+        """Przygotowanie rozgrywki."""
         self.create_players()
         self.draw_background(c.DARK_SAND)
         self.draw_grid()

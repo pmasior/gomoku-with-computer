@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Funkcje do zapisywania logów"""
 
-import pygame
+# import pygame
 
 import constants as c
 
