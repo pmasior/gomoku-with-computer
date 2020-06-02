@@ -6,16 +6,15 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # ukrycie powitania pygame
 import unittest
 
 # pylint: disable=wrong-import-position
-import numpy as np
 
 import constants as c
 import tie
 
 class TestWinningDiagonally1(unittest.TestCase):
-    """Sprawdzanie wygranej po przekątnej \ ."""  # pylint: disable=anomalous-backslash-in-string
+    r"""Sprawdzanie wygranej po przekątnej \ ."""
     def setUp(self):
         self.actual_tie = tie.Tie(None, None)
-        self.board = [[None for n in range(c.FIELDS)] for m in range(c.FIELDS)]
+        self.board = self.actual_tie.create_board_list()
         self.board[0][0] = c.HUMAN
         self.board[1][1] = c.HUMAN
         self.board[2][2] = c.HUMAN
@@ -25,7 +24,7 @@ class TestWinningDiagonally1(unittest.TestCase):
     def test_check_winning_diagonally1(self):
         """Test wykrywania wygranej w check_winning_diagonally1()."""
         self.assertTrue(self.actual_tie.check_winning_diagonally1(2, 2, 0, self.board,
-                                                           c.HUMAN))
+                                                                  c.HUMAN))
 
     def test_check_winning(self):
         """Test wykrywania wygranej w check_winning()."""
@@ -37,7 +36,7 @@ class TestWinningDiagonally2(unittest.TestCase):
     """Sprawdzanie wygranej po przekątnej / ."""
     def setUp(self):
         self.actual_tie = tie.Tie(None, None)
-        self.board = [[None for n in range(c.FIELDS)] for m in range(c.FIELDS)]
+        self.board = self.actual_tie.create_board_list()
         self.board[0][14] = c.HUMAN
         self.board[1][13] = c.HUMAN
         self.board[2][12] = c.HUMAN
@@ -59,7 +58,7 @@ class TestWinningHorizontally(unittest.TestCase):
     """Sprawdzanie braku wygranej w poziomie."""
     def setUp(self):
         self.actual_tie = tie.Tie(None, None)
-        self.board = [[None for n in range(c.FIELDS)] for m in range(c.FIELDS)]
+        self.board = self.actual_tie.create_board_list()
         self.board[0][0] = c.COMPUTER
         self.board[1][0] = c.COMPUTER
         self.board[2][0] = c.COMPUTER
@@ -70,7 +69,7 @@ class TestWinningHorizontally(unittest.TestCase):
     def test_check_winning_horizontally(self):
         """Test braku wygranej w check_winning_horizontally() przy 6 kamieniach."""
         self.assertFalse(self.actual_tie.check_winning_horizontally(2, 0, 0, self.board,
-                                                             c.COMPUTER))
+                                                                    c.COMPUTER))
 
     def test_check_winning(self):
         """Test wykrywania braku wygranej w check_winning() przy 6 kamieniach."""
@@ -87,7 +86,7 @@ class TestWinningVertically(unittest.TestCase):
     """Sprawdzanie braku wygranej w pionie."""
     def setUp(self):
         self.actual_tie = tie.Tie(None, None)
-        self.board = [[None for n in range(c.FIELDS)] for m in range(c.FIELDS)]
+        self.board = self.actual_tie.create_board_list()
         self.board[10][0] = c.COMPUTER
         self.board[10][1] = c.COMPUTER
         self.board[10][2] = c.COMPUTER
@@ -98,7 +97,7 @@ class TestWinningVertically(unittest.TestCase):
     def test_check_winning_vertically(self):
         """Test braku wygranej w check_winning_vertically() przy 6 kamieniach."""
         self.assertFalse(self.actual_tie.check_winning_vertically(10, 2, 0, self.board,
-                                                           c.COMPUTER))
+                                                                  c.COMPUTER))
 
     def test_check_winning(self):
         """Test braku wygranej w check_winning() przy 6 kamieniach w linii."""
@@ -115,11 +114,8 @@ class TestCheckDraw(unittest.TestCase):
     """Sprawdzanie remisu."""
     def setUp(self):
         self.actual_tie = tie.Tie(None, None)
-        self.board = [[None for n in range(c.FIELDS)] for m in range(c.FIELDS)]
-        self.board = np.array(self.board)
-        self.board[::2] = c.HUMAN
-        self.board[1::2] = c.COMPUTER
-        self.board = self.board.tolist()
+        self.board = [[c.COMPUTER if j%2 else c.HUMAN for i in range(c.FIELDS)]
+                      for j in range(c.FIELDS)]
 
     def test_check_winning(self):
         """Test wykrywania braku wygranej w check_winning przy remisie."""

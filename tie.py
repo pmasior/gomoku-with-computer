@@ -17,14 +17,18 @@ class Tie(gui.Gui):
         self.screen = screen
         self.clock = clock
         self.next_player = c.HUMAN
-        self.board = [[None for n in range(c.FIELDS)] for m in range(c.FIELDS)]
+        self.board = self.create_board_list()
         self.all_sprites = pygame.sprite.Group()
         self.winner = None
-        self.last_move_n = None
-        self.last_move_m = None
+        self.last_move_i = None
+        self.last_move_j = None
         self.playing = True
         self.human = None
         self.computer = None
+
+
+    def create_board_list(self):
+        return [[None for j in range(c.FIELDS)] for i in range(c.FIELDS)]
 
 
     def start(self):
@@ -85,14 +89,14 @@ class Tie(gui.Gui):
             if self.winner is None:
                 self.change_player()
                 self.show_actual_player()
-            self.last_move_n = i
-            self.last_move_m = j
+            self.last_move_i = i
+            self.last_move_j = j
             self.draw()
 
 
     def move_computer(self):
         """Wywołanie ruchu wykonywanego przez komputer."""
-        i, j = self.computer.move(self.last_move_n, self.last_move_m)
+        i, j = self.computer.move(self.last_move_i, self.last_move_j)
         if c.LOG_STATE_OF_BOARD > 0:
             develop.print_board(self.board, "Tie")
         self.end_if_gameover(i, j, self.board)
@@ -101,10 +105,10 @@ class Tie(gui.Gui):
             self.show_actual_player()
 
 
-    def end_if_gameover(self, i, j, board):
+    def end_if_gameover(self, move_i, move_j, board):
         """Kończenie gry, jeśli wystąpił koniec gry."""
-        if self.check_winning(i, j, board, self.next_player):
-            self.winner = board[i][j]
+        if self.check_winning(move_i, move_j, board, self.next_player):
+            self.winner = board[move_i][move_j]
             self.show_end_state_of_game()
             self.events()
             self.next_player = None
@@ -114,7 +118,7 @@ class Tie(gui.Gui):
             self.next_player = None
 
 
-    def check_winning(self, i, j, board, actual_player):
+    def check_winning(self, move_i, move_j, board, actual_player):
         """Sprawdza czy koniec gry (wygrana lub remis).
 
         Przyjmuje jako argument współrzędne ostatniego ruchu ostatniego gracza
@@ -127,22 +131,23 @@ class Tie(gui.Gui):
         gdzie + oznacza kamień jednego gracza,
         a _ puste miejsce lub kamień drugiego gracza
         """
-        if i is None or j is None:
+        if move_i is None or move_j is None:
             return False
         for out_extent in range(-2, 3):
-            if (self.check_winning_horizontally(i, j, out_extent, board,
-                                                actual_player) or
-                    self.check_winning_vertically(i, j, out_extent, board,
-                                                  actual_player) or
-                    self.check_winning_diagonally1(i, j, out_extent, board,
-                                                   actual_player) or
-                    self.check_winning_diagonally2(i, j, out_extent, board,
-                                                   actual_player)):
+            if (self.check_winning_horizontally(move_i, move_j, out_extent,
+                                                board, actual_player) or
+                    self.check_winning_vertically(move_i, move_j, out_extent,
+                                                  board, actual_player) or
+                    self.check_winning_diagonally1(move_i, move_j, out_extent,
+                                                   board, actual_player) or
+                    self.check_winning_diagonally2(move_i, move_j, out_extent,
+                                                   board, actual_player)):
                 return True
         return None
 
 
-    def check_winning_horizontally(self, i, j, out_extent, board, actual_player):
+    def check_winning_horizontally(self, move_i, move_j, out_extent, board, 
+                                   actual_player):
         """Sprawdza czy wygrana w poziomie.
 
         Przyjmuje jako argument współrzędne ostatniego ruchu ostatniego gracza.
@@ -151,52 +156,52 @@ class Tie(gui.Gui):
         nie są tego samego gracza. Potem sprawdza czy w poziomie jest dokładnie
         5 takich samych kamieni.
         """
-        left = i - 2 + out_extent
-        right = i + 2 + out_extent
+        left = move_i - 2 + out_extent
+        right = move_i + 2 + out_extent
         if left - 1 >= 0:
-            if board[left - 1][j] == actual_player:
+            if board[left - 1][move_j] == actual_player:
                 return False
         if right + 1 < c.FIELDS:
-            if board[right + 1][j] == actual_player:
+            if board[right + 1][move_j] == actual_player:
                 return False
         if left >= 0 and right < c.FIELDS:
-            if (board[left][j] ==
-                    board[left+1][j] ==
-                    board[left+2][j] ==
-                    board[left+3][j] ==
-                    board[right][j] ==
+            if (board[left][move_j] ==
+                    board[left+1][move_j] ==
+                    board[left+2][move_j] ==
+                    board[left+3][move_j] ==
+                    board[right][move_j] ==
                     actual_player):
                 return True
         return False
 
 
-    def check_winning_vertically(self, i, j, out_extent, board, actual_player):
+    def check_winning_vertically(self, move_i, move_j, out_extent, board, actual_player):
         """Sprawdza czy wygrana w pionie."""
-        top = j - 2 + out_extent
-        down = j + 2 + out_extent
+        top = move_j - 2 + out_extent
+        down = move_j + 2 + out_extent
         if top - 1 >= 0:
-            if board[i][top - 1] == actual_player:
+            if board[move_i][top - 1] == actual_player:
                 return False
         if down + 1 < c.FIELDS:
-            if board[i][down + 1] == actual_player:
+            if board[move_i][down + 1] == actual_player:
                 return False
         if top >= 0 and down < c.FIELDS:
-            if (board[i][top] ==
-                    board[i][top + 1] ==
-                    board[i][top + 2] ==
-                    board[i][top + 3] ==
-                    board[i][down] ==
+            if (board[move_i][top] ==
+                    board[move_i][top + 1] ==
+                    board[move_i][top + 2] ==
+                    board[move_i][top + 3] ==
+                    board[move_i][down] ==
                     actual_player):
                 return True
         return False
 
 
-    def check_winning_diagonally1(self, i, j, out_extent, board, actual_player):
-        """Sprawdza czy wygrana po przekątnej \ ."""  # pylint: disable=anomalous-backslash-in-string
-        left = i - 2 + out_extent
-        right = i + 2 + out_extent
-        top = j - 2 + out_extent
-        down = j + 2 + out_extent
+    def check_winning_diagonally1(self, move_i, move_j, out_extent, board, actual_player):
+        r"""Sprawdza czy wygrana po przekątnej \."""
+        left = move_i - 2 + out_extent
+        right = move_i + 2 + out_extent
+        top = move_j - 2 + out_extent
+        down = move_j + 2 + out_extent
         if left - 1 >= 0 and top - 1 >= 0:
             if board[left - 1][top - 1] == actual_player:
                 return False
@@ -214,12 +219,12 @@ class Tie(gui.Gui):
         return False
 
 
-    def check_winning_diagonally2(self, i, j, out_extent, board, actual_player):
+    def check_winning_diagonally2(self, move_i, move_j, out_extent, board, actual_player):
         """Sprawdza czy wygrana po przekątnej / ."""
-        left = i - 2 + (-out_extent)
-        right = i + 2 + (-out_extent)
-        top = j - 2 + out_extent
-        down = j + 2 + out_extent
+        left = move_i - 2 + (-out_extent)
+        right = move_i + 2 + (-out_extent)
+        top = move_j - 2 + out_extent
+        down = move_j + 2 + out_extent
         if right + 1 < c.FIELDS and top - 1 >= 0:
             if board[right + 1][top - 1] == actual_player:
                 return False

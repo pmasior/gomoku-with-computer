@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """Główny moduł"""
 
-from os import environ
-environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # ukrycie powitania pygame
+# pylint: disable=wrong-import-position
 import sys
 
 try:
+    from os import environ
+    environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # ukrycie powitania pygame
     import pygame
 except ModuleNotFoundError:
     print("Module Pygame not found, so you should install it using command:")
     print("python3 -m pip install pygame")
     sys.exit()
 
-# pylint: disable=wrong-import-position
 import constants as c
 import gui
 import tie
 
 # Ignore false positive pygame errors
-# pylint: disable=E1101
+# pylint: disable=no-member
 
 class Gomoku(gui.Gui):
     """Główna klasa uruchamiająca aplikację."""
