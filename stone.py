@@ -9,21 +9,21 @@ import constants as c
 
 class Stone(pygame.sprite.Sprite):  # pylint: disable=too-few-public-methods
     """Graficzna reprezentacja kamienia na planszy."""
-    def __init__(self, color, x, y):  # pylint: disable=invalid-name
+    def __init__(self, color, x_position, y_position):
         pygame.sprite.Sprite.__init__(self)
-        self.x = x  # pylint: disable=invalid-name
-        self.y = y  # pylint: disable=invalid-name
-        self.color = color
-        self.set_image()
+        self.x_position = x_position
+        self.y_position = y_position
+        self.set_image(color)
 
-    def set_image(self):
+
+    def set_image(self, color):
         """Narysowanie kamienia na planszy."""
-        if self.color == c.WHITE:
-            self.image = pygame.image.load(c.IMG_WHITE_STONE)
-        elif self.color == c.BLACK:
-            self.image = pygame.image.load(c.IMG_BLACK_STONE)
+        if color == c.COMPUTER_STONES_COLOR:
+            self.image = pygame.image.load(c.IMG_COMPUTER_STONE)
+        elif color == c.HUMAN_STONES_COLOR:
+            self.image = pygame.image.load(c.IMG_HUMAN_STONE)
         self.rect = self.image.get_rect()
-        self.rect.center = (self.x, self.y)
+        self.rect.center = (self.x_position, self.y_position)
 
 
 
