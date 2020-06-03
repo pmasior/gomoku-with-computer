@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 "Testy modułu tie"
 
+# pylint: disable=wrong-import-position
+
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # ukrycie powitania pygame
 import unittest
-
-# pylint: disable=wrong-import-position
 
 import constants as c
 import tie
@@ -20,6 +20,7 @@ class TestWinningDiagonally1(unittest.TestCase):
         self.board[2][2] = c.HUMAN
         self.board[3][3] = c.HUMAN
         self.board[4][4] = c.HUMAN
+
 
     def test_check_winning_diagonally1(self):
         """Test wykrywania wygranej w check_winning_diagonally1()."""
@@ -43,10 +44,12 @@ class TestWinningDiagonally2(unittest.TestCase):
         self.board[3][11] = c.HUMAN
         self.board[4][10] = c.HUMAN
 
+
     def test_check_winning_diagonally2(self):
         """Test wykrywania wygranej w check_winning_diagonally2()."""
         self.assertTrue(
             self.actual_tie.check_winning_diagonally2(2, 12, 0, self.board, c.HUMAN))
+
 
     def test_check_winning(self):
         """Test wykrywania wygranej w check_winning()."""
@@ -66,14 +69,17 @@ class TestWinningHorizontally(unittest.TestCase):
         self.board[4][0] = c.COMPUTER
         self.board[5][0] = c.COMPUTER
 
+
     def test_check_winning_horizontally(self):
         """Test braku wygranej w check_winning_horizontally() przy 6 kamieniach."""
         self.assertFalse(self.actual_tie.check_winning_horizontally(2, 0, 0, self.board,
                                                                     c.COMPUTER))
 
+
     def test_check_winning(self):
         """Test wykrywania braku wygranej w check_winning() przy 6 kamieniach."""
         self.assertIsNone(self.actual_tie.check_winning(2, 0, self.board, c.HUMAN))
+
 
     def test_end_if_gameover(self):
         """Test wykrywania braku końca gry w end_if_gameover()."""
@@ -94,14 +100,17 @@ class TestWinningVertically(unittest.TestCase):
         self.board[10][4] = c.COMPUTER
         self.board[10][5] = c.COMPUTER
 
+
     def test_check_winning_vertically(self):
         """Test braku wygranej w check_winning_vertically() przy 6 kamieniach."""
         self.assertFalse(self.actual_tie.check_winning_vertically(10, 2, 0, self.board,
                                                                   c.COMPUTER))
 
+
     def test_check_winning(self):
         """Test braku wygranej w check_winning() przy 6 kamieniach w linii."""
         self.assertIsNone(self.actual_tie.check_winning(10, 2, self.board, c.HUMAN))
+
 
     def test_end_if_gameover(self):
         """Test wykrywania braku końca gry w end_if_gameover()."""
@@ -117,9 +126,11 @@ class TestCheckDraw(unittest.TestCase):
         self.board = [[c.COMPUTER if j%2 else c.HUMAN for i in range(c.FIELDS)]
                       for j in range(c.FIELDS)]
 
+
     def test_check_winning(self):
         """Test wykrywania braku wygranej w check_winning przy remisie."""
         self.assertIsNone(self.actual_tie.check_winning(2, 12, self.board, c.HUMAN))
+
 
     def test_check_draw(self):
         """Test wykrywania remisu."""
@@ -132,6 +143,7 @@ class TestChangePlayer(unittest.TestCase):
     def setUp(self):
         self.actual_tie = tie.Tie(None, None)
         self.actual_tie.next_player = c.COMPUTER
+
 
     def test_cange_player(self):
         """Test zmiany gracza."""

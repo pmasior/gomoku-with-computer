@@ -3,11 +3,13 @@
 
 import constants as c
 
+
 def init_debug_file():
     """Czyści plik używany do zapisywania logów."""
     file = open("resgom.txt", "w")
     file.write(" ")
     file.close()
+
 
 def print_board(board, tekst="default"):
     """Wypisuje stan tablicy board[] do pliku."""

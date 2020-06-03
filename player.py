@@ -91,9 +91,9 @@ class Computer(Player):
     def empty_fields_around(self, move_i, move_j, area=1):
         """ Zwraca zbiór pustych pól wokól zadanych współrzędnych."""
         near_empty_fields = set()
-        left, top, right, bottom = \
+        left, top, right, bottom = (
             self.improve_range_of_array(move_i - area, move_i + area,
-                                        move_j - area, move_j + area)
+                                        move_j - area, move_j + area))
         for i in range(left, right + 1):
             for j in range(top, bottom + 1):
                 if self.check_if_field_is_empty(i, j, self.board_copy):
@@ -203,31 +203,31 @@ class Computer(Player):
     def score_nonfinal_situation_in_line(self, line, player):
         """Ocenia sytuację w jednej linii planszy przekazanej jako argument."""
         if len(line) == 6:
-            none_s = line.count(None)
+            none_stones = line.count(None)
             if player == c.HUMAN:
-                me_s = line.count(c.HUMAN)
+                me_stones = line.count(c.HUMAN)
                 opponent = c.COMPUTER
             elif player == c.COMPUTER:
-                me_s = line.count(c.COMPUTER)
+                me_stones = line.count(c.COMPUTER)
                 opponent = c.HUMAN
 
-            if me_s == 4:
+            if me_stones == 4:
                 for i in range(-2, 1):
                     if line[i] == line[i+1] == None:
                         return 80
-                if none_s == 2 and ((line[0] is None) != (line[-1] is None)):
+                if none_stones == 2 and ((line[0] is None) != (line[-1] is None)):
                     return 70
-                if none_s == 1 and ((line[0] == opponent) != (line[-1] == opponent)):
+                if none_stones == 1 and ((line[0] == opponent) != (line[-1] == opponent)):
                     return 70
 
-            if none_s == 3:
+            if none_stones == 3:
                 for i in range(0, 4):
                     if line[i:i+3].count(player) == 3:
                         return 60
-                if me_s == 3 and line[0] == line[-1] is None:
+                if me_stones == 3 and line[0] == line[-1] is None:
                     return 50
 
-            if none_s == 2:
+            if none_stones == 2:
                 if (line[0] == opponent) != (line[-1] == opponent):
                     for i in (1, 2):
                         if line[i:i+3].count(player) == 3:

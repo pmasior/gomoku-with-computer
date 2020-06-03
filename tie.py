@@ -146,7 +146,7 @@ class Tie(gui.Gui):
         return None
 
 
-    def check_winning_horizontally(self, move_i, move_j, out_extent, board, 
+    def check_winning_horizontally(self, move_i, move_j, out_extent, board,
                                    actual_player):
         """Sprawdza czy wygrana w poziomie.
 
