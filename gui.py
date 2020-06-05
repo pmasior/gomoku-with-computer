@@ -6,7 +6,7 @@ import pygame
 import constants as c
 
 # Ignore false positive pygame errors
-# pylint: disable=E1101
+# pylint: disable=no-member
 
 class Gui:
     """Obsługa graficznego interfejsu użytkownika."""
