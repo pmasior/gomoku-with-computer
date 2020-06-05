@@ -9,7 +9,7 @@ import gui
 import player
 
 # Ignore false positive pygame errors
-# pylint: disable=E1101
+# pylint: disable=no-member
 
 class Tie(gui.Gui):
     """Reprezentacja planszy w Gomoku."""

@@ -45,9 +45,9 @@ class Human(Player):
     """Reprezentuje gracza, który jest człowiekim."""
     def move(self, mouse_x, mouse_y):
         """Sprawdza czy ruch jest dozwolony, jeśli jest to go wykonuje."""
-        for j in range(0, c.FIELDS):
+        for j in range(c.FIELDS):
             y_position = c.GRID_Y_BEGIN + j * c.GRID_TILESIZE
-            for i in range(0, c.FIELDS):
+            for i in range(c.FIELDS):
                 x_position = c.GRID_X_BEGIN + i * c.GRID_TILESIZE
                 if (self.check_if_clicked_in_field(x_position, y_position,
                                                    mouse_x, mouse_y) and
@@ -188,7 +188,7 @@ class Computer(Player):
 
         score = 0
         for tab in horizontally, vertically, diagonally1, diagonally2:
-            for i in range(0, c.LINE_LENGTH_TO_CHECK):
+            for i in range(c.LINE_LENGTH_TO_CHECK):
                 line = tab[i:i+c.LINE_LENGTH_TO_CHECK]
                 temp_score = self.score_nonfinal_situation_in_line(line,
                                                                    earlier_player)

@@ -15,8 +15,8 @@ def print_board(board, tekst="default"):
     """Wypisuje stan tablicy board[] do pliku."""
     if c.LOG_TO_FILE == 0:
         print("\n print_board()", tekst)
-        for j in range(0, c.FIELDS):
-            for i in range(0, c.FIELDS):
+        for j in range(c.FIELDS):
+            for i in range(c.FIELDS):
                 if board[i][j] is not None:
                     print(board[i][j], end=' ')
                 else:
@@ -25,8 +25,8 @@ def print_board(board, tekst="default"):
     elif c.LOG_TO_FILE == 1:
         file = open("resgom.txt", "a")
         file.write(f"\n print_board() {tekst}\n")
-        for j in range(0, c.FIELDS):
-            for i in range(0, c.FIELDS):
+        for j in range(c.FIELDS):
+            for i in range(c.FIELDS):
                 if board[i][j] is not None:
                     file.write(str(board[i][j]))
                     file.write(" ")
